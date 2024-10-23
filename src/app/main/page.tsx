@@ -4,6 +4,7 @@ import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 import { useState } from 'react'
 
 export default function MainPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [issues, setIssues] = useState([
     {
       uiSection: 'Header',
