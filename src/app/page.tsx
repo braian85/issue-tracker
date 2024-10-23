@@ -1,16 +1,10 @@
-import Image from 'next/image'
+import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 
 export default function Home() {
   return (
     <div className='grid grid-rows-[auto_1fr_auto] min-h-screen px-8 pb-20 gap-16 sm:px-20 sm:pt-5 sm:pb-20 font-[family-name:var(--font-geist-sans)]'>
       <header className='flex justify-between items-center'>
-        <Image
-          src='/logo.svg'
-          alt='Issue Tracker Logo'
-          width={180}
-          height={38}
-          priority
-        />
+        <IssueTrackerLogo />
         <nav>
           <a href='#features' className='mr-4 hover:underline'>
             Features

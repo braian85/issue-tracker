@@ -1,7 +1,7 @@
 'use client'
 
+import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 import { useState } from 'react'
-import Image from 'next/image'
 
 export default function MainPage() {
   const [issues, setIssues] = useState([
@@ -29,34 +29,34 @@ export default function MainPage() {
   ])
 
   return (
-    <div className='flex h-screen bg-gray-100'>
+    <div className='flex h-screen bg-[#202020]'>
       {/* Sidebar */}
-      <aside className='w-64 bg-white shadow-md'>
+      <aside className='w-64 bg-[#333030] shadow-md'>
         <div className='p-4'>
-          <Image src='/logo.svg' alt='Logo' width={150} height={50} />
+          <IssueTrackerLogo />
         </div>
         <nav className='mt-8'>
           <a
             href='#'
-            className='block py-2 px-4 text-gray-700 hover:bg-gray-200'
+            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
           >
             Dashboard
           </a>
           <a
             href='#'
-            className='block py-2 px-4 text-gray-700 hover:bg-gray-200'
+            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
           >
             Issues
           </a>
           <a
             href='#'
-            className='block py-2 px-4 text-gray-700 hover:bg-gray-200'
+            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
           >
             Projects
           </a>
           <a
             href='#'
-            className='block py-2 px-4 text-gray-700 hover:bg-gray-200'
+            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
           >
             Settings
           </a>
@@ -64,30 +64,30 @@ export default function MainPage() {
       </aside>
 
       {/* Main content */}
-      <main className='flex-1 p-8'>
+      <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3]'>
         <h1 className='text-2xl font-bold mb-6'>Issues Dashboard</h1>
-        <div className='bg-white shadow-md rounded-lg overflow-hidden'>
-          <table className='min-w-full divide-y divide-gray-200'>
-            <thead className='bg-gray-50'>
+        <div className='bg-[#333030] shadow-md rounded-lg overflow-hidden'>
+          <table className='min-w-full divide-y divide-[#3F3F3F]'>
+            <thead className='bg-[#202020]'>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   UI Section
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   Description
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   Type
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   Priority
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-white divide-y divide-gray-200'>
+            <tbody className='bg-[#181818] divide-y divide-[#3F3F3F]'>
               {issues.map((issue, index) => (
                 <tr key={index}>
                   <td className='px-6 py-4 whitespace-nowrap'>
