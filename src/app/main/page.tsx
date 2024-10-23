@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 export default function MainPage() {
   const [issues, setIssues] = useState([
     {
+      id: 1,
       uiSection: 'Header',
       description: 'Add logo',
       type: 'Enhancement',
@@ -13,6 +14,7 @@ export default function MainPage() {
       status: 'In Progress',
     },
     {
+      id: 2,
       uiSection: 'Footer',
       description: 'Fix broken links',
       type: 'Bug',
@@ -20,6 +22,7 @@ export default function MainPage() {
       status: 'In Progress',
     },
     {
+      id: 3,
       uiSection: 'Dashboard',
       description: 'Implement dark mode',
       type: 'Feature',
@@ -37,21 +40,35 @@ export default function MainPage() {
   })
 
   const [isFormValid, setIsFormValid] = useState(false)
+  const [selectedIssues, setSelectedIssues] = useState<number[]>([])
+  const [editingIssue, setEditingIssue] = useState<number | null>(null)
+  const [isAddingIssue, setIsAddingIssue] = useState(false)
 
   useEffect(() => {
     setIsFormValid(Object.values(newIssue).every(value => value !== ''))
   }, [newIssue])
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    issueId?: number
   ) => {
     const { name, value } = e.target
-    setNewIssue(prev => ({ ...prev, [name]: value }))
+    if (issueId !== undefined) {
+      setIssues(prev =>
+        prev.map(issue =>
+          issue.id === issueId ? { ...issue, [name]: value } : issue
+        )
+      )
+    } else {
+      setNewIssue(prev => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleAddIssue = () => {
     if (isFormValid) {
-      setIssues(prev => [...prev, newIssue])
+      const newId =
+        issues.length > 0 ? Math.max(...issues.map(i => i.id)) + 1 : 1
+      setIssues(prev => [...prev, { ...newIssue, id: newId }])
       setNewIssue({
         uiSection: '',
         description: '',
@@ -59,7 +76,46 @@ export default function MainPage() {
         priority: '',
         status: '',
       })
+      setIsAddingIssue(false)
     }
+  }
+
+  const handleCheckboxChange = (id: number) => {
+    setSelectedIssues(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIssues(issues.map(issue => issue.id))
+    } else {
+      setSelectedIssues([])
+    }
+  }
+
+  const handleDeleteSelected = () => {
+    setIssues(prev => prev.filter(issue => !selectedIssues.includes(issue.id)))
+    setSelectedIssues([])
+  }
+
+  const handleEditIssue = (issue: any) => {
+    setEditingIssue(issue.id)
+  }
+
+  const handleUpdateIssue = () => {
+    setEditingIssue(null)
+  }
+
+  const handleCancelAddIssue = () => {
+    setIsAddingIssue(false)
+    setNewIssue({
+      uiSection: '',
+      description: '',
+      type: '',
+      priority: '',
+      status: '',
+    })
   }
 
   return (
@@ -105,6 +161,14 @@ export default function MainPage() {
             <thead className='bg-[#202020]'>
               <tr>
                 <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                  <input
+                    type='checkbox'
+                    onChange={handleSelectAll}
+                    checked={issues.length > 0 && selectedIssues.length === issues.length}
+                    className='form-checkbox h-5 w-5 text-[#B52C2C]'
+                  />
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
                   UI Section
                 </th>
                 <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
@@ -122,98 +186,216 @@ export default function MainPage() {
               </tr>
             </thead>
             <tbody className='bg-[#181818] divide-y divide-[#3F3F3F]'>
-              {issues.map((issue, index) => (
-                <tr key={index}>
+              {issues.map(issue => (
+                <tr key={issue.id}>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    {issue.uiSection}
+                    <input
+                      type='checkbox'
+                      checked={selectedIssues.includes(issue.id)}
+                      onChange={() => handleCheckboxChange(issue.id)}
+                      className='form-checkbox h-5 w-5 text-[#B52C2C]'
+                    />
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    {issue.description}
+                    {editingIssue === issue.id ? (
+                      <input
+                        type='text'
+                        name='uiSection'
+                        value={issue.uiSection}
+                        onChange={(e) => handleInputChange(e, issue.id)}
+                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      />
+                    ) : (
+                      issue.uiSection
+                    )}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>{issue.type}</td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    {issue.priority}
+                    {editingIssue === issue.id ? (
+                      <input
+                        type='text'
+                        name='description'
+                        value={issue.description}
+                        onChange={(e) => handleInputChange(e, issue.id)}
+                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      />
+                    ) : (
+                      issue.description
+                    )}
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
-                    {issue.status}
+                    {editingIssue === issue.id ? (
+                      <select
+                        name='type'
+                        value={issue.type}
+                        onChange={(e) => handleInputChange(e, issue.id)}
+                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      >
+                        <option value='Enhancement'>Enhancement</option>
+                        <option value='Bug'>Bug</option>
+                        <option value='Feature'>Feature</option>
+                      </select>
+                    ) : (
+                      issue.type
+                    )}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    {editingIssue === issue.id ? (
+                      <select
+                        name='priority'
+                        value={issue.priority}
+                        onChange={(e) => handleInputChange(e, issue.id)}
+                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      >
+                        <option value='Low'>Low</option>
+                        <option value='Medium'>Medium</option>
+                        <option value='High'>High</option>
+                      </select>
+                    ) : (
+                      issue.priority
+                    )}
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    {editingIssue === issue.id ? (
+                      <select
+                        name='status'
+                        value={issue.status}
+                        onChange={(e) => handleInputChange(e, issue.id)}
+                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      >
+                        <option value='Planned'>Planned</option>
+                        <option value='In Progress'>In Progress</option>
+                        <option value='Completed'>Completed</option>
+                      </select>
+                    ) : (
+                      issue.status
+                    )}
                   </td>
                 </tr>
               ))}
-              <tr>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <input
-                    type='text'
-                    name='uiSection'
-                    value={newIssue.uiSection}
-                    onChange={handleInputChange}
-                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
-                    placeholder='UI Section'
-                  />
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <input
-                    type='text'
-                    name='description'
-                    value={newIssue.description}
-                    onChange={handleInputChange}
-                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
-                    placeholder='Description'
-                  />
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <select
-                    name='type'
-                    value={newIssue.type}
-                    onChange={handleInputChange}
-                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
-                  >
-                    <option value=''>Select Type</option>
-                    <option value='Enhancement'>Enhancement</option>
-                    <option value='Bug'>Bug</option>
-                    <option value='Feature'>Feature</option>
-                  </select>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <select
-                    name='priority'
-                    value={newIssue.priority}
-                    onChange={handleInputChange}
-                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
-                  >
-                    <option value=''>Select Priority</option>
-                    <option value='Medium'>Medium</option>
-                    <option value='High'>High</option>
-                    <option value='Low'>Low</option>
-                  </select>
-                </td>
-                <td className='px-6 py-4 whitespace-nowrap'>
-                  <select
-                    name='status'
-                    value={newIssue.status}
-                    onChange={handleInputChange}
-                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
-                  >
-                    <option value=''>Select Status</option>
-                    <option value='Planned'>Planned</option>
-                    <option value='In Progress'>In Progress</option>
-                    <option value='Completed'>Completed</option>
-                  </select>
-                </td>
-              </tr>
+              {isAddingIssue && (
+                <tr>
+                  <td className='px-6 py-4 whitespace-nowrap'></td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <input
+                      type='text'
+                      name='uiSection'
+                      value={newIssue.uiSection}
+                      onChange={handleInputChange}
+                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      placeholder='UI Section'
+                    />
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <input
+                      type='text'
+                      name='description'
+                      value={newIssue.description}
+                      onChange={handleInputChange}
+                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      placeholder='Description'
+                    />
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <select
+                      name='type'
+                      value={newIssue.type}
+                      onChange={handleInputChange}
+                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                    >
+                      <option value=''>Select Type</option>
+                      <option value='Enhancement'>Enhancement</option>
+                      <option value='Bug'>Bug</option>
+                      <option value='Feature'>Feature</option>
+                    </select>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <select
+                      name='priority'
+                      value={newIssue.priority}
+                      onChange={handleInputChange}
+                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                    >
+                      <option value=''>Select Priority</option>
+                      <option value='Low'>Low</option>
+                      <option value='Medium'>Medium</option>
+                      <option value='High'>High</option>
+                    </select>
+                  </td>
+                  <td className='px-6 py-4 whitespace-nowrap'>
+                    <select
+                      name='status'
+                      value={newIssue.status}
+                      onChange={handleInputChange}
+                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                    >
+                      <option value=''>Select Status</option>
+                      <option value='Planned'>Planned</option>
+                      <option value='In Progress'>In Progress</option>
+                      <option value='Completed'>Completed</option>
+                    </select>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-        <button
-          onClick={handleAddIssue}
-          disabled={!isFormValid}
-          className={`mt-4 px-4 py-2 rounded ${
-            isFormValid
-              ? 'bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
-              : 'bg-[#666666] text-[#9D9D9D] cursor-not-allowed'
-          }`}
-        >
-          Add Issue
-        </button>
+        <div className='mt-4 flex space-x-2'>
+          {!isAddingIssue && selectedIssues.length !== 1 && (
+            <button
+              onClick={() => setIsAddingIssue(true)}
+              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+            >
+              Add Issue
+            </button>
+          )}
+          {isAddingIssue && (
+            <>
+              <button
+                onClick={handleAddIssue}
+                disabled={!isFormValid}
+                className={`px-4 py-2 rounded ${
+                  isFormValid
+                    ? 'bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+                    : 'bg-[#666666] text-[#9D9D9D] cursor-not-allowed'
+                }`}
+              >
+                Accept
+              </button>
+              <button
+                onClick={handleCancelAddIssue}
+                className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              >
+                Cancel
+              </button>
+            </>
+          )}
+          {editingIssue && (
+            <button
+              onClick={handleUpdateIssue}
+              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+            >
+              Update Issue
+            </button>
+          )}
+          {selectedIssues.length > 0 && (
+            <button
+              onClick={handleDeleteSelected}
+              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+            >
+              Delete Selected
+            </button>
+          )}
+          {selectedIssues.length === 1 && !editingIssue && (
+            <button
+              onClick={() =>
+                handleEditIssue(issues.find(i => i.id === selectedIssues[0]))
+              }
+              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+            >
+              Edit Selected
+            </button>
+          )}
+        </div>
       </main>
     </div>
   )
