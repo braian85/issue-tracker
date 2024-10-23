@@ -1,101 +1,122 @@
-import Image from "next/image";
+import Image from 'next/image'
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+    <div className='grid grid-rows-[auto_1fr_auto] min-h-screen px-8 pb-20 gap-16 sm:px-20 sm:pt-5 sm:pb-20 font-[family-name:var(--font-geist-sans)]'>
+      <header className='flex justify-between items-center'>
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
+          src='/logo.svg'
+          alt='Issue Tracker Logo'
           width={180}
           height={38}
           priority
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+        <nav>
+          <a href='#features' className='mr-4 hover:underline'>
+            Features
+          </a>
+          <a href='#pricing' className='mr-4 hover:underline'>
+            Pricing
+          </a>
+          <a href='#contact' className='hover:underline'>
+            Contact
+          </a>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
+      <main className='flex flex-col gap-8 items-center text-center'>
+        <h1 className='text-4xl font-bold mb-4'>
+          Track Issues Fast and Efficiently
+        </h1>
+        <p className='text-xl mb-8'>
+          Prioritize, visualize, and resolve issues with ease using our powerful
+          Issue Tracker app.
+        </p>
+
+        <div className='flex gap-4 items-center flex-col sm:flex-row'>
           <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            className='rounded-full bg-blue-600 text-white px-6 py-3 hover:bg-blue-700 transition-colors'
+            href='#signup'
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
+            Get Started
           </a>
           <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            className='rounded-full border border-solid border-gray-300 px-6 py-3 hover:bg-gray-100 transition-colors'
+            href='#demo'
           >
-            Read our docs
+            Watch Demo
           </a>
         </div>
+
+        <div
+          id='features'
+          className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 mt-16'
+        >
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>Priority Management</h3>
+            <p>
+              Easily set and adjust issue priorities to focus on what matters
+              most.
+            </p>
+          </div>
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>Traffic Light System</h3>
+            <p>
+              Visualize issue status at a glance with our intuitive traffic
+              light indicators.
+            </p>
+          </div>
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>Checklists</h3>
+            <p>
+              Break down complex issues into manageable tasks with built-in
+              checklists.
+            </p>
+          </div>
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>Highlights</h3>
+            <p>
+              Emphasize critical information and key updates within each issue.
+            </p>
+          </div>
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>Real-time Updates</h3>
+            <p>
+              Stay informed with instant notifications and live issue tracking.
+            </p>
+          </div>
+          <div className='p-6 border rounded-lg'>
+            <h3 className='text-xl font-semibold mb-2'>
+              Customizable Workflows
+            </h3>
+            <p>
+              Tailor the app to fit your team&apos;s unique issue management
+              process.
+            </p>
+          </div>
+        </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+
+      <footer className='flex gap-6 flex-wrap items-center justify-center mt-16'>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
+          href='#about'
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
+          About Us
         </a>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
+          href='#privacy'
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
+          Privacy Policy
         </a>
         <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+          className='flex items-center gap-2 hover:underline hover:underline-offset-4'
+          href='#terms'
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
+          Terms of Service
         </a>
       </footer>
     </div>
-  );
+  )
 }
