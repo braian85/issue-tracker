@@ -2,6 +2,15 @@
 
 import { useState, useEffect } from 'react'
 
+interface Issue {
+  id: number
+  uiSection: string
+  description: string
+  type: string
+  priority: string
+  status: string
+}
+
 export default function IssuesPage() {
   const [issues, setIssues] = useState([
     {
@@ -98,7 +107,7 @@ export default function IssuesPage() {
     setSelectedIssues([])
   }
 
-  const handleEditIssue = (issue: any) => {
+  const handleEditIssue = (issue: Issue) => {
     setEditingIssue(issue.id)
   }
 
@@ -356,9 +365,10 @@ export default function IssuesPage() {
           )}
           {selectedIssues.length === 1 && !editingIssue && (
             <button
-              onClick={() =>
-                handleEditIssue(issues.find(i => i.id === selectedIssues[0]))
-              }
+              onClick={() => {
+                const issue = issues.find(i => i.id === selectedIssues[0])
+                if (issue) handleEditIssue(issue)
+              }}
               className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
             >
               Edit Selected
