@@ -1,9 +1,8 @@
 'use client'
 
-import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 import { useState, useEffect } from 'react'
 
-export default function MainPage() {
+export default function IssuesPage() {
   const [issues, setIssues] = useState([
     {
       id: 1,
@@ -119,42 +118,9 @@ export default function MainPage() {
   }
 
   return (
-    <div className='flex h-screen bg-[#202020]'>
-      {/* Sidebar */}
-      <aside className='w-64 bg-[#333030] shadow-md'>
-        <div className='p-4'>
-          <IssueTrackerLogo />
-        </div>
-        <nav className='mt-8'>
-          <a
-            href='#'
-            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
-          >
-            Dashboard
-          </a>
-          <a
-            href='#'
-            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
-          >
-            Issues
-          </a>
-          <a
-            href='#'
-            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
-          >
-            Projects
-          </a>
-          <a
-            href='#'
-            className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
-          >
-            Settings
-          </a>
-        </nav>
-      </aside>
-
+    <div className='flex flex-col h-full bg-[#202020]'>
       {/* Main content */}
-      <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3]'>
+      <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues Dashboard</h1>
         <div className='bg-[#333030] shadow-md rounded-lg overflow-hidden'>
           <table className='min-w-full divide-y divide-[#3F3F3F]'>
@@ -164,7 +130,10 @@ export default function MainPage() {
                   <input
                     type='checkbox'
                     onChange={handleSelectAll}
-                    checked={issues.length > 0 && selectedIssues.length === issues.length}
+                    checked={
+                      issues.length > 0 &&
+                      selectedIssues.length === issues.length
+                    }
                     className='form-checkbox h-5 w-5 text-[#B52C2C]'
                   />
                 </th>
@@ -202,7 +171,7 @@ export default function MainPage() {
                         type='text'
                         name='uiSection'
                         value={issue.uiSection}
-                        onChange={(e) => handleInputChange(e, issue.id)}
+                        onChange={e => handleInputChange(e, issue.id)}
                         className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
                       />
                     ) : (
@@ -215,7 +184,7 @@ export default function MainPage() {
                         type='text'
                         name='description'
                         value={issue.description}
-                        onChange={(e) => handleInputChange(e, issue.id)}
+                        onChange={e => handleInputChange(e, issue.id)}
                         className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
                       />
                     ) : (
@@ -227,7 +196,7 @@ export default function MainPage() {
                       <select
                         name='type'
                         value={issue.type}
-                        onChange={(e) => handleInputChange(e, issue.id)}
+                        onChange={e => handleInputChange(e, issue.id)}
                         className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
                       >
                         <option value='Enhancement'>Enhancement</option>
@@ -243,7 +212,7 @@ export default function MainPage() {
                       <select
                         name='priority'
                         value={issue.priority}
-                        onChange={(e) => handleInputChange(e, issue.id)}
+                        onChange={e => handleInputChange(e, issue.id)}
                         className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
                       >
                         <option value='Low'>Low</option>
@@ -259,7 +228,7 @@ export default function MainPage() {
                       <select
                         name='status'
                         value={issue.status}
-                        onChange={(e) => handleInputChange(e, issue.id)}
+                        onChange={e => handleInputChange(e, issue.id)}
                         className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
                       >
                         <option value='Planned'>Planned</option>
