@@ -1,10 +1,9 @@
 'use client'
 
 import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function MainPage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [issues, setIssues] = useState([
     {
       uiSection: 'Header',
@@ -18,7 +17,7 @@ export default function MainPage() {
       description: 'Fix broken links',
       type: 'Bug',
       priority: 'High',
-      status: 'Open',
+      status: 'In Progress',
     },
     {
       uiSection: 'Dashboard',
@@ -28,6 +27,40 @@ export default function MainPage() {
       status: 'Planned',
     },
   ])
+
+  const [newIssue, setNewIssue] = useState({
+    uiSection: '',
+    description: '',
+    type: '',
+    priority: '',
+    status: '',
+  })
+
+  const [isFormValid, setIsFormValid] = useState(false)
+
+  useEffect(() => {
+    setIsFormValid(Object.values(newIssue).every(value => value !== ''))
+  }, [newIssue])
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target
+    setNewIssue(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleAddIssue = () => {
+    if (isFormValid) {
+      setIssues(prev => [...prev, newIssue])
+      setNewIssue({
+        uiSection: '',
+        description: '',
+        type: '',
+        priority: '',
+        status: '',
+      })
+    }
+  }
 
   return (
     <div className='flex h-screen bg-[#202020]'>
@@ -106,9 +139,81 @@ export default function MainPage() {
                   </td>
                 </tr>
               ))}
+              <tr>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <input
+                    type='text'
+                    name='uiSection'
+                    value={newIssue.uiSection}
+                    onChange={handleInputChange}
+                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                    placeholder='UI Section'
+                  />
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <input
+                    type='text'
+                    name='description'
+                    value={newIssue.description}
+                    onChange={handleInputChange}
+                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                    placeholder='Description'
+                  />
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <select
+                    name='type'
+                    value={newIssue.type}
+                    onChange={handleInputChange}
+                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                  >
+                    <option value=''>Select Type</option>
+                    <option value='Enhancement'>Enhancement</option>
+                    <option value='Bug'>Bug</option>
+                    <option value='Feature'>Feature</option>
+                  </select>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <select
+                    name='priority'
+                    value={newIssue.priority}
+                    onChange={handleInputChange}
+                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                  >
+                    <option value=''>Select Priority</option>
+                    <option value='Medium'>Medium</option>
+                    <option value='High'>High</option>
+                    <option value='Low'>Low</option>
+                  </select>
+                </td>
+                <td className='px-6 py-4 whitespace-nowrap'>
+                  <select
+                    name='status'
+                    value={newIssue.status}
+                    onChange={handleInputChange}
+                    className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                  >
+                    <option value=''>Select Status</option>
+                    <option value='Planned'>Planned</option>
+                    <option value='In Progress'>In Progress</option>
+                    <option value='Completed'>Completed</option>
+                  </select>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
+        <button
+          onClick={handleAddIssue}
+          disabled={!isFormValid}
+          className={`mt-4 px-4 py-2 rounded ${
+            isFormValid
+              ? 'bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              : 'bg-[#666666] text-[#9D9D9D] cursor-not-allowed'
+          }`}
+        >
+          Add Issue
+        </button>
       </main>
     </div>
   )
