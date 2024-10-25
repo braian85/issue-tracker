@@ -63,7 +63,9 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, account, profile }) {
       if (account && profile) {
+        console.log(account)
         token.accessToken = account.access_token
+        token.id_token = account.id_token
         token.id = profile.sub
         token.name = profile.name
         token.email = profile.email
@@ -71,9 +73,12 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
-    async session({ session, token }) {
+    async session({ session, token, account }) {
+      console.log('session afuera: ', session)
       if (session.user) {
-        session.user.id = token.id as string
+        console.log('token:', token)
+        // session.user.id = token.id as string
+        session.token = token.id_token
       }
       return session
     },

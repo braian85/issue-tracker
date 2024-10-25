@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { getAllIssues } from '@/clientAPI'
 
 interface Issue {
   id: number
@@ -12,32 +13,7 @@ interface Issue {
 }
 
 export default function IssuesPage() {
-  const [issues, setIssues] = useState([
-    {
-      id: 1,
-      uiSection: 'Header',
-      description: 'Add logo',
-      type: 'Enhancement',
-      priority: 'Medium',
-      status: 'In Progress',
-    },
-    {
-      id: 2,
-      uiSection: 'Footer',
-      description: 'Fix broken links',
-      type: 'Bug',
-      priority: 'High',
-      status: 'In Progress',
-    },
-    {
-      id: 3,
-      uiSection: 'Dashboard',
-      description: 'Implement dark mode',
-      type: 'Feature',
-      priority: 'Low',
-      status: 'Planned',
-    },
-  ])
+  const [issues, setIssues] = useState<Issue[]>([])
 
   const [newIssue, setNewIssue] = useState({
     uiSection: '',
@@ -51,6 +27,20 @@ export default function IssuesPage() {
   const [selectedIssues, setSelectedIssues] = useState<number[]>([])
   const [editingIssue, setEditingIssue] = useState<number | null>(null)
   const [isAddingIssue, setIsAddingIssue] = useState(false)
+
+  useEffect(() => {
+    const fetchIssues = async () => {
+      try {
+        const fetchedIssues = await getAllIssues()
+        setIssues(fetchedIssues)
+      } catch (error) {
+        console.error('Failed to fetch issues:', error)
+        // Handle error (e.g., show error message to user)
+      }
+    }
+
+    fetchIssues()
+  }, [])
 
   useEffect(() => {
     setIsFormValid(Object.values(newIssue).every(value => value !== ''))
@@ -125,6 +115,8 @@ export default function IssuesPage() {
       status: '',
     })
   }
+
+  console.log('issues: ', issues)
 
   return (
     <div className='flex flex-col h-full bg-[#202020]'>
