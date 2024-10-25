@@ -1,20 +1,27 @@
 import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
+import Link from 'next/link'
 
 export default function Home() {
   return (
     <div className='grid grid-rows-[auto_1fr_auto] min-h-screen px-8 pb-20 gap-16 sm:px-20 sm:pt-5 sm:pb-20 font-[family-name:var(--font-geist-sans)]'>
       <header className='flex justify-between items-center'>
         <IssueTrackerLogo />
-        <nav>
+        <nav className='flex items-center'>
           <a href='#features' className='mr-4 hover:underline'>
             Features
           </a>
           <a href='#pricing' className='mr-4 hover:underline'>
             Pricing
           </a>
-          <a href='#contact' className='hover:underline'>
+          <a href='#contact' className='mr-4 hover:underline'>
             Contact
           </a>
+          <Link href="/login" className='mr-4 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600 transition-colors'>
+            Sign In
+          </Link>
+          <Link href="/register" className='px-3 py-2 rounded-md bg-green-500 text-white hover:bg-green-600 transition-colors'>
+            Sign Up
+          </Link>
         </nav>
       </header>
 
