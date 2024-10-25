@@ -35,19 +35,6 @@ export default function RegisterPage() {
     }
   }
 
-  const handleGoogleSignUp = async () => {
-    try {
-      const result = await signIn('google', { callbackUrl: '/dashboard' })
-      if (result?.error) {
-        setError('Google sign-in failed. Please try again.')
-      }
-      // No necesitas hacer nada más aquí, la redirección se manejará automáticamente
-    } catch (error) {
-      console.error('Error during Google sign-up:', error)
-      setError('An error occurred during Google sign-in. Please try again.')
-    }
-  }
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded shadow-md w-96">
@@ -86,13 +73,6 @@ export default function RegisterPage() {
               className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline mb-4"
             >
               Sign Up
-            </button>
-            <button
-              type="button"
-              onClick={handleGoogleSignUp}
-              className="w-full px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-700 focus:outline-none focus:shadow-outline mb-4"
-            >
-              Sign Up with Google
             </button>
             <Link href="/login" className="inline-block text-sm font-bold text-blue-500 align-baseline hover:text-blue-800">
               Already have an account? Login

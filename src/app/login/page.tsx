@@ -32,6 +32,19 @@ export default function LoginPage() {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signIn('google', { callbackUrl: '/dashboard' })
+      if (result?.error) {
+        setError('Google sign-in failed. Please try again.')
+      }
+      // No need to do anything else here, redirection will be handled automatically
+    } catch (error) {
+      console.error('Error during Google sign-in:', error)
+      setError('An error occurred during Google sign-in. Please try again.')
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded shadow-md w-96">
@@ -64,12 +77,19 @@ export default function LoginPage() {
               required
             />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-center justify-between">
             <button
               type="submit"
-              className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline"
+              className="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:shadow-outline mb-4"
             >
               Sign In
+            </button>
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="w-full px-4 py-2 font-bold text-white bg-red-500 rounded hover:bg-red-700 focus:outline-none focus:shadow-outline mb-4"
+            >
+              Sign In with Google
             </button>
             <Link href="/register" className="inline-block text-sm font-bold text-blue-500 align-baseline hover:text-blue-800">
               Need an account? Register
