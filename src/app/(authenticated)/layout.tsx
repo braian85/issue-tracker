@@ -4,12 +4,21 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import Sidebar from '@/components/sidebar/sidebar'
+import Providers from '@/components/Providers'
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  return (
+    <Providers>
+      <AuthContent>{children}</AuthContent>
+    </Providers>
+  )
+}
+
+function AuthContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
 
@@ -18,10 +27,6 @@ export default function AuthLayout({
       router.push('/login')
     }
   }, [status, router])
-
-  if (status === 'loading') {
-    return <div>Loading...</div>
-  }
 
   if (!session) {
     return null
