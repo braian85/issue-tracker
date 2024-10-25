@@ -35,8 +35,17 @@ export default function RegisterPage() {
     }
   }
 
-  const handleGoogleSignUp = () => {
-    signIn('google', { callbackUrl: '/dashboard' })
+  const handleGoogleSignUp = async () => {
+    try {
+      const result = await signIn('google', { callbackUrl: '/dashboard' })
+      if (result?.error) {
+        setError('Google sign-in failed. Please try again.')
+      }
+      // No necesitas hacer nada más aquí, la redirección se manejará automáticamente
+    } catch (error) {
+      console.error('Error during Google sign-up:', error)
+      setError('An error occurred during Google sign-in. Please try again.')
+    }
   }
 
   return (
