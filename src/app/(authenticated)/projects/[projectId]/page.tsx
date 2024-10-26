@@ -1,7 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getAllIssues } from '@/clientAPI/issues/index'
+import { useParams } from 'next/navigation'
+import {
+  getProjectIssues,
+  createIssue,
+  updateIssue,
+  deleteIssue
+} from '@/clientAPI/projects/index'
 
 interface Issue {
   id: number
@@ -13,8 +19,8 @@ interface Issue {
 }
 
 export default function IssuesPage() {
+  const { projectId } = useParams()
   const [issues, setIssues] = useState<Issue[]>([])
-
   const [newIssue, setNewIssue] = useState({
     uiSection: '',
     description: '',
@@ -22,7 +28,6 @@ export default function IssuesPage() {
     priority: '',
     status: '',
   })
-
   const [isFormValid, setIsFormValid] = useState(false)
   const [selectedIssues, setSelectedIssues] = useState<number[]>([])
   const [editingIssue, setEditingIssue] = useState<number | null>(null)
@@ -31,16 +36,15 @@ export default function IssuesPage() {
   useEffect(() => {
     const fetchIssues = async () => {
       try {
-        const fetchedIssues = await getAllIssues()
+        const fetchedIssues = await getProjectIssues(Number(projectId))
         setIssues(fetchedIssues)
       } catch (error) {
         console.error('Failed to fetch issues:', error)
-        // Handle error (e.g., show error message to user)
       }
     }
 
     fetchIssues()
-  }, [])
+  }, [projectId])
 
   useEffect(() => {
     setIsFormValid(Object.values(newIssue).every(value => value !== ''))
@@ -62,19 +66,22 @@ export default function IssuesPage() {
     }
   }
 
-  const handleAddIssue = () => {
+  const handleAddIssue = async () => {
     if (isFormValid) {
-      const newId =
-        issues.length > 0 ? Math.max(...issues.map(i => i.id)) + 1 : 1
-      setIssues(prev => [...prev, { ...newIssue, id: newId }])
-      setNewIssue({
-        uiSection: '',
-        description: '',
-        type: '',
-        priority: '',
-        status: '',
-      })
-      setIsAddingIssue(false)
+      try {
+        const createdIssue = await createIssue(Number(projectId), newIssue)
+        setIssues(prev => [...prev, createdIssue])
+        setNewIssue({
+          uiSection: '',
+          description: '',
+          type: '',
+          priority: '',
+          status: '',
+        })
+        setIsAddingIssue(false)
+      } catch (error) {
+        console.error('Failed to create issue:', error)
+      }
     }
   }
 
@@ -92,17 +99,37 @@ export default function IssuesPage() {
     }
   }
 
-  const handleDeleteSelected = () => {
-    setIssues(prev => prev.filter(issue => !selectedIssues.includes(issue.id)))
-    setSelectedIssues([])
+  const handleDeleteSelected = async () => {
+    try {
+      await Promise.all(selectedIssues.map(issueId => deleteIssue(Number(projectId), issueId)))
+      setIssues(prev => prev.filter(issue => !selectedIssues.includes(issue.id)))
+      setSelectedIssues([])
+    } catch (error) {
+      console.error('Failed to delete issues:', error)
+    }
   }
 
   const handleEditIssue = (issue: Issue) => {
     setEditingIssue(issue.id)
   }
 
-  const handleUpdateIssue = () => {
-    setEditingIssue(null)
+  const handleUpdateIssue = async () => {
+    if (editingIssue) {
+      try {
+        const updatedIssue = issues.find(issue => issue.id === editingIssue)
+        if (updatedIssue) {
+          await updateIssue(Number(projectId), editingIssue, updatedIssue)
+          setIssues(prev =>
+            prev.map(issue =>
+              issue.id === editingIssue ? updatedIssue : issue
+            )
+          )
+        }
+        setEditingIssue(null)
+      } catch (error) {
+        console.error('Failed to update issue:', error)
+      }
+    }
   }
 
   const handleCancelAddIssue = () => {
@@ -116,11 +143,8 @@ export default function IssuesPage() {
     })
   }
 
-  console.log('issues: ', issues)
-
   return (
     <div className='flex flex-col h-full bg-[#202020]'>
-      {/* Main content */}
       <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues Dashboard</h1>
         <div className='bg-[#333030] shadow-md rounded-lg overflow-hidden'>

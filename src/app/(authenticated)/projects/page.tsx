@@ -10,20 +10,22 @@ import {
 interface Project {
   id: number
   name: string
+  description: string
   createdAt: string
   updatedAt: string
 }
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
-  const [newProject, setNewProject] = useState({ name: '' })
+  const [newProject, setNewProject] = useState({ name: '', description: '' })
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const fetchedProjects = await getAllProjects()
-        setProjects(fetchedProjects)
+        setProjects(fetchedProjects as Project[])
       } catch (error) {
         console.error('Failed to fetch projects:', error)
       }
@@ -43,39 +45,72 @@ export default function ProjectsPage() {
     e.preventDefault()
     try {
       const createdProject = await createProject(newProject)
-      setProjects(prev => [...prev, createdProject])
-      setNewProject({ name: '' })
+      setProjects(prev => [...prev, createdProject as Project])
+      setNewProject({ name: '', description: '' })
+      setIsModalOpen(false)
     } catch (error) {
       console.error('Failed to create project:', error)
     }
   }
 
   const handleProjectClick = (projectId: number) => {
-    router.push(`/issues?projectId=${projectId}`)
+    router.push(`/projects/${projectId}`)
   }
 
   return (
-    <div className='p-8 text-gray-300 min-h-screen'>
-      <h1 className='text-3xl font-bold mb-6 text-red-500'>Projects</h1>
-
-      <form onSubmit={handleCreateProject} className='mb-8 bg-gray-800 p-6 rounded-lg shadow-md'>
-        <h2 className='text-xl font-semibold mb-4 text-red-400'>Create New Project</h2>
-        <input
-          type='text'
-          name='name'
-          value={newProject.name}
-          onChange={handleInputChange}
-          placeholder='Project Name'
-          className='w-full p-2 mb-4 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-300'
-          required
-        />
+    <div className='p-8 text-gray-300 min-h-screen relative'>
+      <div className='flex justify-between items-center mb-6'>
+        <h1 className='text-3xl font-bold text-red-500'>Projects</h1>
         <button
-          type='submit'
+          onClick={() => setIsModalOpen(true)}
           className='bg-red-600 text-gray-200 px-4 py-2 rounded hover:bg-red-700 transition duration-300'
         >
-          Create Project
+          New Project
         </button>
-      </form>
+      </div>
+
+      {isModalOpen && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
+          <div className='bg-gray-800 p-6 rounded-lg shadow-md'>
+            <h2 className='text-xl font-semibold mb-4 text-red-400'>Create New Project</h2>
+            <form onSubmit={handleCreateProject}>
+              <input
+                type='text'
+                name='name'
+                value={newProject.name}
+                onChange={handleInputChange}
+                placeholder='Project Name'
+                className='w-full p-2 mb-4 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-300'
+                required
+              />
+              <input
+                type='text'
+                name='description'
+                value={newProject.description}
+                onChange={handleInputChange}
+                placeholder='Project Description'
+                className='w-full p-2 mb-4 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-300'
+                required
+              />
+              <div className='flex justify-end'>
+                <button
+                  type='button'
+                  onClick={() => setIsModalOpen(false)}
+                  className='mr-2 bg-gray-600 text-gray-200 px-4 py-2 rounded hover:bg-gray-700 transition duration-300'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='bg-red-600 text-gray-200 px-4 py-2 rounded hover:bg-red-700 transition duration-300'
+                >
+                  Create
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className='bg-gray-800 p-6 rounded-lg shadow-md'>
         <h2 className='text-xl font-semibold mb-4 text-red-400'>Existing Projects</h2>

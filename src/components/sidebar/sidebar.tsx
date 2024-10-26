@@ -19,12 +19,6 @@ export default function Sidebar() {
           Dashboard
         </a>
         <a
-          href='/issues'
-          className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
-        >
-          Issues
-        </a>
-        <a
           href='/projects'
           className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
         >
