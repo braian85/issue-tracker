@@ -25,6 +25,12 @@ export default function Sidebar() {
           Issues
         </a>
         <a
+          href='/projects'
+          className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
+        >
+          Projects
+        </a>
+        <a
           href='/settings'
           className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
         >

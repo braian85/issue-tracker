@@ -1,18 +1,16 @@
 import axios from 'axios'
 import { getSession } from 'next-auth/react'
+import { Session } from 'next-auth'
 
 export const getAllIssues = async () => {
   try {
-    const session = await getSession()
+    const session = (await getSession()) as Session & { token: string }
 
     console.log('Session:', session)
 
     if (!session) {
       throw new Error('No active session found')
     }
-
-    console.log('Acá la sesion es: ', session)
-    console.log('AccessToken:', session?.token)
 
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/issues`,

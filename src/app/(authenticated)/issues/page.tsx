@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getAllIssues } from '@/clientAPI'
+import { getAllIssues } from '@/clientAPI/issues/index'
 
 interface Issue {
   id: number
