@@ -1,7 +1,29 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 import Link from 'next/link'
 
 export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/projects')
+    }
+  }, [status, router])
+
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (status === 'authenticated') {
+    return null // This will prevent the home page content from flashing before redirect
+  }
+
   return (
     <div className='grid grid-rows-[auto_1fr_auto] min-h-screen px-8 pb-20 gap-16 sm:px-20 sm:pt-5 sm:pb-20 font-[family-name:var(--font-geist-sans)]'>
       <header className='flex justify-between items-center'>

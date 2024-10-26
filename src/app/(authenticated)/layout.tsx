@@ -1,10 +1,9 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import Sidebar from '@/components/sidebar/sidebar'
-import Providers from '@/components/Providers'
 import Navbar from '@/components/navbar'
 
 export default function AuthLayout({
@@ -12,24 +11,21 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <Providers>
-      <AuthContent>{children}</AuthContent>
-    </Providers>
-  )
-}
-
-function AuthContent({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' && pathname !== '/') {
       router.push('/login')
     }
-  }, [status, router])
+  }, [status, router, pathname])
 
-  if (!session) {
+  if (status === 'loading') {
+    return <div>Loading...</div>
+  }
+
+  if (!session && pathname !== '/') {
     return null
   }
 
