@@ -2,6 +2,7 @@ import type { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import { createHmac } from 'crypto'
 import { JWT } from 'next-auth/jwt'
+import { Session } from 'next-auth'
 
 async function refreshAccessToken(token: JWT) {
   try {
@@ -113,22 +114,28 @@ export const authOptions: NextAuthOptions = {
         token.id = profile.sub
         token.name = profile.name
         token.email = profile.email
-        token.picture = profile.picture
+        token.image = profile.image
       }
 
       // Return previous token if the access token has not expired yet
-      if (token.expiresAt && Date.now() < token.expiresAt) {
+      if (token.expiresAt && Date.now() < (token.expiresAt as number)) {
         return token
       }
 
       // Access token has expired, try to refresh it
       return refreshAccessToken(token)
     },
-    async session({ session, token }) {
+    async session({
+      session,
+      token,
+    }: {
+      session: Session & { token?: string }
+      token: JWT
+    }) {
       if (session.user) {
         console.log('token:', token)
         // session.user.id = token.id as string
-        session.token = token.id_token
+        session.token = token.id_token as string
       }
       return session
     },
