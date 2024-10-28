@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getSession } from 'next-auth/react'
+import { getSession, signIn } from 'next-auth/react'
 import { Session } from 'next-auth'
 
 interface Project {
@@ -36,6 +36,38 @@ axiosInstance.interceptors.request.use(
     return config
   },
   error => {
+    return Promise.reject(error)
+  }
+)
+
+// Add a response interceptor after the request interceptor
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config
+
+    // If the error is 401 and we haven't tried to refresh yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true
+
+      try {
+        // Trigger NextAuth's sign in flow which will refresh the token
+        await signIn('google', { redirect: false })
+        
+        // Get the new session with fresh token
+        const newSession = (await getSession()) as Session & { token: string }
+        
+        // Update the request header with new token
+        originalRequest.headers['Authorization'] = `Bearer ${newSession.token}`
+        
+        // Retry the original request
+        return axiosInstance(originalRequest)
+      } catch (refreshError) {
+        // If refresh fails, redirect to login
+        window.location.href = '/auth/signin'
+        return Promise.reject(refreshError)
+      }
+    }
     return Promise.reject(error)
   }
 )

@@ -32,9 +32,9 @@ export default function AuthLayout({
   return (
     <div className='flex h-screen bg-[#202020]'>
       <Sidebar />
-      <div className='flex flex-col flex-1'>
+      <div className='flex flex-col flex-1 h-full'>
         <Navbar />
-        <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] max-h-[100vh] overflow-y-auto'>
+        <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] overflow-y-hidden'>
           {children}
         </main>
       </div>
