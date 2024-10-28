@@ -2,7 +2,7 @@ import axios from 'axios'
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 
-const authOptions: NextAuthOptions = {
+export const OPTIONS: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -105,5 +105,5 @@ async function refreshAccessToken(token) {
   }
 }
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(OPTIONS)
 export { handler as GET, handler as POST }
