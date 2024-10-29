@@ -76,7 +76,7 @@ export const authOptions: NextAuthOptions = {
 
         const hmac = createHmac(
           'sha256',
-          process.env.NEXT_PUBLIC_SHARED_SECRET!
+          process.env.NEXT_SHARED_SECRET!
         )
         hmac.update(payload)
         const signature = hmac.digest('hex')
