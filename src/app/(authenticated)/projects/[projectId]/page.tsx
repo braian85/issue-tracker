@@ -66,7 +66,11 @@ export default function IssuesPage() {
     }
   }
 
-  const handleAddIssue = async () => {
+  const handleRowClick = () => {
+    setIsAddingIssue(true)
+  }
+
+  const handleBlur = async () => {
     if (isFormValid) {
       try {
         const createdIssue = await createIssue(Number(projectId), newIssue)
@@ -144,14 +148,14 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className='flex flex-col h-full bg-gray-800'>
-      <main className='flex-1 p-8 bg-gray-900 text-gray-100 overflow-auto'>
-        <h1 className='text-2xl font-bold mb-6'>Issues Dashboard</h1>
-        <div className='bg-gray-700 shadow-md rounded-lg overflow-hidden'>
-          <table className='min-w-full divide-y divide-gray-600'>
-            <thead className='bg-gray-800'>
+    <div className='flex flex-col h-full bg-background'>
+      <main className='flex-1 p-8 bg-background text-foreground overflow-auto'>
+        <h1 className='text-2xl font-bold mb-6'>Issues</h1>
+        <div className='bg-card shadow-md rounded-lg overflow-hidden'>
+          <table className='min-w-full divide-y divide-border text-sm'>
+            <thead className='bg-muted'>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   <input
                     type='checkbox'
                     onChange={handleSelectAll}
@@ -159,70 +163,70 @@ export default function IssuesPage() {
                       issues.length > 0 &&
                       selectedIssues.length === issues.length
                     }
-                    className='form-checkbox h-5 w-5 text-red-600'
+                    className='form-checkbox h-4 w-4 text-primary'
                   />
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   UI Section
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Description
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Type
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Priority
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-gray-900 divide-y divide-gray-600'>
+            <tbody className='bg-background divide-y divide-border'>
               {issues.map(issue => (
                 <tr key={issue.id}>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <input
                       type='checkbox'
                       checked={selectedIssues.includes(issue.id)}
                       onChange={() => handleCheckboxChange(issue.id)}
-                      className='form-checkbox h-5 w-5 text-red-600'
+                      className='form-checkbox h-4 w-4 text-primary'
                     />
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     {editingIssue === issue.id ? (
                       <input
                         type='text'
                         name='uiSection'
                         value={issue.uiSection}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       />
                     ) : (
                       issue.uiSection
                     )}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     {editingIssue === issue.id ? (
                       <input
                         type='text'
                         name='description'
                         value={issue.description}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       />
                     ) : (
                       issue.description
                     )}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     {editingIssue === issue.id ? (
                       <select
                         name='type'
                         value={issue.type}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       >
                         <option value='Enhancement'>Enhancement</option>
                         <option value='Bug'>Bug</option>
@@ -232,13 +236,13 @@ export default function IssuesPage() {
                       issue.type
                     )}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     {editingIssue === issue.id ? (
                       <select
                         name='priority'
                         value={issue.priority}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       >
                         <option value='Low'>Low</option>
                         <option value='Medium'>Medium</option>
@@ -248,13 +252,13 @@ export default function IssuesPage() {
                       issue.priority
                     )}
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     {editingIssue === issue.id ? (
                       <select
                         name='status'
                         value={issue.status}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       >
                         <option value='Planned'>Planned</option>
                         <option value='In Progress'>In Progress</option>
@@ -268,33 +272,36 @@ export default function IssuesPage() {
               ))}
               {isAddingIssue && (
                 <tr>
-                  <td className='px-6 py-4 whitespace-nowrap'></td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'></td>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <input
                       type='text'
                       name='uiSection'
                       value={newIssue.uiSection}
                       onChange={handleInputChange}
-                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                      onBlur={handleBlur}
+                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       placeholder='UI Section'
                     />
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <input
                       type='text'
                       name='description'
                       value={newIssue.description}
                       onChange={handleInputChange}
-                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                      onBlur={handleBlur}
+                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                       placeholder='Description'
                     />
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <select
                       name='type'
                       value={newIssue.type}
                       onChange={handleInputChange}
-                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                      onBlur={handleBlur}
+                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                     >
                       <option value=''>Select Type</option>
                       <option value='Enhancement'>Enhancement</option>
@@ -302,12 +309,13 @@ export default function IssuesPage() {
                       <option value='Feature'>Feature</option>
                     </select>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <select
                       name='priority'
                       value={newIssue.priority}
                       onChange={handleInputChange}
-                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                      onBlur={handleBlur}
+                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                     >
                       <option value=''>Select Priority</option>
                       <option value='Low'>Low</option>
@@ -315,12 +323,13 @@ export default function IssuesPage() {
                       <option value='High'>High</option>
                     </select>
                   </td>
-                  <td className='px-6 py-4 whitespace-nowrap'>
+                  <td className='px-4 py-2 whitespace-nowrap'>
                     <select
                       name='status'
                       value={newIssue.status}
                       onChange={handleInputChange}
-                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
+                      onBlur={handleBlur}
+                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
                     >
                       <option value=''>Select Status</option>
                       <option value='Planned'>Planned</option>
@@ -330,43 +339,21 @@ export default function IssuesPage() {
                   </td>
                 </tr>
               )}
+              {!isAddingIssue && (
+                <tr onClick={handleRowClick} className='bg-blue-500'>
+                  <td colSpan={6} className='px-4 py-2 whitespace-nowrap text-center text-white text-sm'>
+                    Add Issue
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
         <div className='mt-4 flex space-x-2'>
-          {!isAddingIssue && selectedIssues.length !== 1 && (
-            <button
-              onClick={() => setIsAddingIssue(true)}
-              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
-            >
-              Add Issue
-            </button>
-          )}
-          {isAddingIssue && (
-            <>
-              <button
-                onClick={handleAddIssue}
-                disabled={!isFormValid}
-                className={`px-4 py-2 rounded ${
-                  isFormValid
-                    ? 'bg-red-600 text-gray-100 hover:bg-red-700'
-                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                }`}
-              >
-                Accept
-              </button>
-              <button
-                onClick={handleCancelAddIssue}
-                className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
-              >
-                Cancel
-              </button>
-            </>
-          )}
           {editingIssue && (
             <button
               onClick={handleUpdateIssue}
-              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
+              className='px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90'
             >
               Update Issue
             </button>
@@ -374,7 +361,7 @@ export default function IssuesPage() {
           {selectedIssues.length > 0 && (
             <button
               onClick={handleDeleteSelected}
-              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
+              className='px-4 py-2 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
               Delete Selected
             </button>
@@ -385,7 +372,7 @@ export default function IssuesPage() {
                 const issue = issues.find(i => i.id === selectedIssues[0])
                 if (issue) handleEditIssue(issue)
               }}
-              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
+              className='px-4 py-2 rounded bg-primary text-primary-foreground hover:bg-primary/90'
             >
               Edit Selected
             </button>

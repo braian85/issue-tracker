@@ -16,7 +16,8 @@ const IssueTrackerLogo: React.FC = () => {
         fontWeight='bold'
         fill='#9D9D9D'
       >
-        Issue<tspan fill='#B52C2C'>TRACKER</tspan>
+        <tspan fill='currentColor'>Issue</tspan>
+        <tspan fill='#3A82F6'>TRACKER</tspan>
       </text>
     </svg>
   )
