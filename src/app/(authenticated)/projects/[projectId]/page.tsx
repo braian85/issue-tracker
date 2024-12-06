@@ -185,7 +185,7 @@ export default function IssuesPage() {
             </thead>
             <tbody className='bg-background divide-y divide-border'>
               {issues.map(issue => (
-                <tr key={issue.id}>
+                <tr key={issue.id} className='hover:bg-gray-100 dark:hover:bg-gray-700'>
                   <td className='px-4 py-2 whitespace-nowrap'>
                     <input
                       type='checkbox'
