@@ -30,11 +30,11 @@ export default function AuthLayout({
   }
 
   return (
-    <div className='flex h-screen bg-[#202020]'>
+    <div className='flex h-screen bg-background'>
       <Sidebar />
       <div className='flex flex-col flex-1 h-full'>
         <Navbar />
-        <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] overflow-y-hidden'>
+        <main className='flex-1 p-4 bg-background text-foreground overflow-y-hidden'>
           {children}
         </main>
       </div>

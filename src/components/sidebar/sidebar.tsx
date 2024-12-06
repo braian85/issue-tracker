@@ -1,5 +1,6 @@
 import IssueTrackerLogo from '@/components/logo/issueTrackerLogo'
 import { signOut } from 'next-auth/react'
+import Link from 'next/link'
 
 export default function Sidebar() {
   const handleLogout = () => {
@@ -7,34 +8,34 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className='w-64 bg-[#333030] shadow-md h-screen overflow-y-auto flex flex-col'>
+    <aside className='w-64 bg-background shadow-md h-screen overflow-y-auto flex flex-col'>
       <div className='p-4 flex-shrink-0'>
         <IssueTrackerLogo />
       </div>
       <nav className='mt-8 flex-grow'>
-        <a
+        <Link
           href='/dashboard'
-          className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
+          className='block py-2 px-4 text-foreground border border-transparent hover:border hover:border-violet-700 transition-all duration-500'
         >
           Dashboard
-        </a>
-        <a
+        </Link>
+        <Link
           href='/projects'
-          className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
+          className='block py-2 px-4 text-foreground border border-transparent hover:border hover:border-violet-700 transition-all duration-500'
         >
           Projects
-        </a>
-        <a
+        </Link>
+        <Link
           href='/settings'
-          className='block py-2 px-4 text-[#EFE3E3] hover:bg-[#3F3F3F]'
+          className='block py-2 px-4 text-foreground border border-transparent hover:border hover:border-violet-700 transition-all duration-500'
         >
           Settings
-        </a>
+        </Link>
       </nav>
       <div className='p-4'>
         <button
           onClick={handleLogout}
-          className='w-full py-2 px-4 text-[#EFE3E3] bg-[#3F3F3F] hover:bg-[#4F4F4F] rounded'
+          className='w-full py-2 px-4 text-foreground bg-background hover:bg-accent rounded'
         >
           Logout
         </button>

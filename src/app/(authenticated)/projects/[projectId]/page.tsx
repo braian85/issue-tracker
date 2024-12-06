@@ -144,14 +144,14 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className='flex flex-col h-full bg-[#202020]'>
-      <main className='flex-1 p-8 bg-[#181818] text-[#EFE3E3] overflow-auto'>
+    <div className='flex flex-col h-full bg-gray-800'>
+      <main className='flex-1 p-8 bg-gray-900 text-gray-100 overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues Dashboard</h1>
-        <div className='bg-[#333030] shadow-md rounded-lg overflow-hidden'>
-          <table className='min-w-full divide-y divide-[#3F3F3F]'>
-            <thead className='bg-[#202020]'>
+        <div className='bg-gray-700 shadow-md rounded-lg overflow-hidden'>
+          <table className='min-w-full divide-y divide-gray-600'>
+            <thead className='bg-gray-800'>
               <tr>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   <input
                     type='checkbox'
                     onChange={handleSelectAll}
@@ -159,27 +159,27 @@ export default function IssuesPage() {
                       issues.length > 0 &&
                       selectedIssues.length === issues.length
                     }
-                    className='form-checkbox h-5 w-5 text-[#B52C2C]'
+                    className='form-checkbox h-5 w-5 text-red-600'
                   />
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   UI Section
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   Description
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   Type
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   Priority
                 </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-[#9D9D9D] uppercase tracking-wider'>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-[#181818] divide-y divide-[#3F3F3F]'>
+            <tbody className='bg-gray-900 divide-y divide-gray-600'>
               {issues.map(issue => (
                 <tr key={issue.id}>
                   <td className='px-6 py-4 whitespace-nowrap'>
@@ -187,7 +187,7 @@ export default function IssuesPage() {
                       type='checkbox'
                       checked={selectedIssues.includes(issue.id)}
                       onChange={() => handleCheckboxChange(issue.id)}
-                      className='form-checkbox h-5 w-5 text-[#B52C2C]'
+                      className='form-checkbox h-5 w-5 text-red-600'
                     />
                   </td>
                   <td className='px-6 py-4 whitespace-nowrap'>
@@ -197,7 +197,7 @@ export default function IssuesPage() {
                         name='uiSection'
                         value={issue.uiSection}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       />
                     ) : (
                       issue.uiSection
@@ -210,7 +210,7 @@ export default function IssuesPage() {
                         name='description'
                         value={issue.description}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       />
                     ) : (
                       issue.description
@@ -222,7 +222,7 @@ export default function IssuesPage() {
                         name='type'
                         value={issue.type}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       >
                         <option value='Enhancement'>Enhancement</option>
                         <option value='Bug'>Bug</option>
@@ -238,7 +238,7 @@ export default function IssuesPage() {
                         name='priority'
                         value={issue.priority}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       >
                         <option value='Low'>Low</option>
                         <option value='Medium'>Medium</option>
@@ -254,7 +254,7 @@ export default function IssuesPage() {
                         name='status'
                         value={issue.status}
                         onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                        className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       >
                         <option value='Planned'>Planned</option>
                         <option value='In Progress'>In Progress</option>
@@ -275,7 +275,7 @@ export default function IssuesPage() {
                       name='uiSection'
                       value={newIssue.uiSection}
                       onChange={handleInputChange}
-                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       placeholder='UI Section'
                     />
                   </td>
@@ -285,7 +285,7 @@ export default function IssuesPage() {
                       name='description'
                       value={newIssue.description}
                       onChange={handleInputChange}
-                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                       placeholder='Description'
                     />
                   </td>
@@ -294,7 +294,7 @@ export default function IssuesPage() {
                       name='type'
                       value={newIssue.type}
                       onChange={handleInputChange}
-                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                     >
                       <option value=''>Select Type</option>
                       <option value='Enhancement'>Enhancement</option>
@@ -307,7 +307,7 @@ export default function IssuesPage() {
                       name='priority'
                       value={newIssue.priority}
                       onChange={handleInputChange}
-                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                     >
                       <option value=''>Select Priority</option>
                       <option value='Low'>Low</option>
@@ -320,7 +320,7 @@ export default function IssuesPage() {
                       name='status'
                       value={newIssue.status}
                       onChange={handleInputChange}
-                      className='bg-[#202020] text-[#EFE3E3] px-2 py-1 w-full'
+                      className='bg-gray-800 text-gray-100 px-2 py-1 w-full'
                     >
                       <option value=''>Select Status</option>
                       <option value='Planned'>Planned</option>
@@ -337,7 +337,7 @@ export default function IssuesPage() {
           {!isAddingIssue && selectedIssues.length !== 1 && (
             <button
               onClick={() => setIsAddingIssue(true)}
-              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
             >
               Add Issue
             </button>
@@ -349,15 +349,15 @@ export default function IssuesPage() {
                 disabled={!isFormValid}
                 className={`px-4 py-2 rounded ${
                   isFormValid
-                    ? 'bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
-                    : 'bg-[#666666] text-[#9D9D9D] cursor-not-allowed'
+                    ? 'bg-red-600 text-gray-100 hover:bg-red-700'
+                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                 }`}
               >
                 Accept
               </button>
               <button
                 onClick={handleCancelAddIssue}
-                className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+                className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
               >
                 Cancel
               </button>
@@ -366,7 +366,7 @@ export default function IssuesPage() {
           {editingIssue && (
             <button
               onClick={handleUpdateIssue}
-              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
             >
               Update Issue
             </button>
@@ -374,7 +374,7 @@ export default function IssuesPage() {
           {selectedIssues.length > 0 && (
             <button
               onClick={handleDeleteSelected}
-              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
             >
               Delete Selected
             </button>
@@ -385,7 +385,7 @@ export default function IssuesPage() {
                 const issue = issues.find(i => i.id === selectedIssues[0])
                 if (issue) handleEditIssue(issue)
               }}
-              className='px-4 py-2 rounded bg-[#B52C2C] text-[#EFE3E3] hover:bg-[#9D2424]'
+              className='px-4 py-2 rounded bg-red-600 text-gray-100 hover:bg-red-700'
             >
               Edit Selected
             </button>

@@ -2,10 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { getAllProjects, createProject } from '@/clientAPI/projects/index'
 import {
-  getAllProjects,
-  createProject,
-} from '@/clientAPI/projects/index'
+  Table,
+  TableCaption,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from '@/components/ui/table'
 
 interface Project {
   id: number
@@ -34,9 +40,7 @@ export default function ProjectsPage() {
     fetchProjects()
   }, [])
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setNewProject(prev => ({ ...prev, [name]: value }))
   }
@@ -58,53 +62,71 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className='p-8 text-gray-300 min-h-screen relative'>
-      <div className='flex justify-between items-center mb-6'>
-        <h1 className='text-3xl font-bold text-red-500'>Projects</h1>
+    <div className='container mx-auto px-4 py-4'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-4xl font-bold text-blue-500'>Projects</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className='bg-red-600 text-gray-200 px-4 py-2 rounded hover:bg-red-700 transition duration-300'
+          className='text-white px-6 py-3 rounded-lg dark:bg-blue-600 bg-blue-600 hover:bg-blue-700 transition duration-300 shadow-lg'
         >
-          New Project
+          Create New Project
         </button>
       </div>
 
       {isModalOpen && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center'>
-          <div className='bg-gray-800 p-6 rounded-lg shadow-md'>
-            <h2 className='text-xl font-semibold mb-4 text-red-400'>Create New Project</h2>
-            <form onSubmit={handleCreateProject}>
-              <input
-                type='text'
-                name='name'
-                value={newProject.name}
-                onChange={handleInputChange}
-                placeholder='Project Name'
-                className='w-full p-2 mb-4 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-300'
-                required
-              />
-              <input
-                type='text'
-                name='description'
-                value={newProject.description}
-                onChange={handleInputChange}
-                placeholder='Project Description'
-                className='w-full p-2 mb-4 bg-gray-900 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-300'
-                required
-              />
-              <div className='flex justify-end'>
+        <div className='fixed inset-0 bg-black/70 flex items-center justify-center backdrop-blur-sm z-50'>
+          <div className='p-8 rounded-xl shadow-2xl max-w-md w-full mx-4'>
+            <h2 className='text-2xl font-semibold mb-6 text-blue-400'>
+              Create New Project
+            </h2>
+            <form onSubmit={handleCreateProject} className='space-y-6'>
+              <div className='space-y-2'>
+                <label
+                  htmlFor='name'
+                  className='block text-sm font-medium text-gray-300'
+                >
+                  Project Name
+                </label>
+                <input
+                  id='name'
+                  type='text'
+                  name='name'
+                  value={newProject.name}
+                  onChange={handleInputChange}
+                  className='w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-300'
+                  required
+                />
+              </div>
+              <div className='space-y-2'>
+                <label
+                  htmlFor='description'
+                  className='block text-sm font-medium text-gray-300'
+                >
+                  Project Description
+                </label>
+                <input
+                  id='description'
+                  type='text'
+                  name='description'
+                  value={newProject.description}
+                  onChange={handleInputChange}
+                  className='w-full p-3 bg-gray-900 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-300'
+                  required
+                />
+              </div>
+              <div className='flex justify-end space-x-4 pt-4'>
                 <button
                   type='button'
                   onClick={() => setIsModalOpen(false)}
-                  className='mr-2 bg-gray-600 text-gray-200 px-4 py-2 rounded hover:bg-gray-700 transition duration-300'
+                  className='px-6 py-3 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition duration-300'
                 >
                   Cancel
                 </button>
                 <button
                   type='submit'
-                  className='bg-red-600 text-gray-200 px-4 py-2 rounded hover:bg-red-700 transition duration-300'
+                  className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300 shadow-lg'
                 >
-                  Create
+                  Create Project
                 </button>
               </div>
             </form>
@@ -112,31 +134,36 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      <div className='bg-gray-800 p-6 rounded-lg shadow-md'>
-        <h2 className='text-xl font-semibold mb-4 text-red-400'>Existing Projects</h2>
-        <div className='overflow-x-auto'>
-          <table className='w-full border-collapse'>
-            <thead>
-              <tr className='bg-gray-700'>
-                <th className='border border-gray-600 p-2 text-left text-red-400'>Name</th>
-                <th className='border border-gray-600 p-2 text-left text-red-400'>Created</th>
-                <th className='border border-gray-600 p-2 text-left text-red-400'>Updated</th>
-              </tr>
-            </thead>
-            <tbody> 
+      <div className='rounded-xl shadow-xl p-8'>
+        <div className='overflow-hidden rounded-lg border border-gray-700'>
+          <Table>
+            <TableHeader>
+              <TableRow className='hover:bg-transparent border-gray-700'>
+                <TableHead className='text-gray-800 dark:text-gray-300'>Name</TableHead>
+                <TableHead className='text-gray-800 dark:text-gray-300'>Created</TableHead>
+                <TableHead className='text-gray-800 dark:text-gray-300'>Updated</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {projects.map(project => (
-                <tr 
-                  key={project.id} 
-                  className='hover:bg-gray-700 cursor-pointer transition duration-150'
+                <TableRow
+                  key={project.id}
+                  className='cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors border-gray-700'
                   onClick={() => handleProjectClick(project.id)}
                 >
-                  <td className='border border-gray-600 p-2 text-gray-300'>{project.name}</td>
-                  <td className='border border-gray-600 p-2 text-gray-300'>{new Date(project.createdAt).toLocaleString()}</td>
-                  <td className='border border-gray-600 p-2 text-gray-300'>{new Date(project.updatedAt).toLocaleString()}</td>
-                </tr>
+                  <TableCell className='font-medium text-gray-900 dark:text-gray-200'>
+                    {project.name}
+                  </TableCell>
+                  <TableCell className='text-gray-800 dark:text-gray-300'>
+                    {new Date(project.createdAt).toLocaleString()}
+                  </TableCell>
+                  <TableCell className='text-gray-800 dark:text-gray-300'>
+                    {new Date(project.updatedAt).toLocaleString()}
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       </div>
     </div>
