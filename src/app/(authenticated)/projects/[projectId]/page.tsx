@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import {
   getProjectIssues,
   createIssue,
   updateIssue,
-  deleteIssue
+  deleteIssue,
 } from '@/clientAPI/projects/index'
+import { FaCheck, FaTimes } from 'react-icons/fa'
 
 interface Issue {
   id: number
@@ -32,6 +33,11 @@ export default function IssuesPage() {
   const [selectedIssues, setSelectedIssues] = useState<number[]>([])
   const [editingIssue, setEditingIssue] = useState<number | null>(null)
   const [isAddingIssue, setIsAddingIssue] = useState(false)
+  const firstInputRef = useRef<HTMLInputElement>(null)
+  const editingRef = useRef<HTMLTableRowElement>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [isTabbing, setIsTabbing] = useState(false)
+  const [highlightCompleted, setHighlightCompleted] = useState(false)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -49,6 +55,23 @@ export default function IssuesPage() {
   useEffect(() => {
     setIsFormValid(Object.values(newIssue).every(value => value !== ''))
   }, [newIssue])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        editingRef.current &&
+        !editingRef.current.contains(event.target as Node)
+      ) {
+        handleUpdateIssue()
+        setIsAddingIssue(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [editingIssue, issues])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -68,53 +91,67 @@ export default function IssuesPage() {
 
   const handleRowClick = () => {
     setIsAddingIssue(true)
+    setTimeout(() => {
+      firstInputRef.current?.focus()
+    }, 0)
   }
 
-  const handleBlur = async () => {
-    if (isFormValid) {
-      try {
-        const createdIssue = await createIssue(Number(projectId), newIssue)
-        setIssues(prev => [...prev, createdIssue])
-        setNewIssue({
-          uiSection: '',
-          description: '',
-          type: '',
-          priority: '',
-          status: '',
-        })
-        setIsAddingIssue(false)
-      } catch (error) {
-        console.error('Failed to create issue:', error)
+  const handleBlur = async (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (!isTabbing && !editingRef.current?.contains(e.relatedTarget as Node)) {
+      if (isFormValid) {
+        try {
+          const createdIssue = await createIssue(Number(projectId), newIssue)
+          setIssues(prev => [...prev, createdIssue])
+        } catch (error) {
+          console.error('Failed to create issue:', error)
+        }
       }
+      resetNewIssue()
     }
   }
 
-  const handleCheckboxChange = (id: number) => {
-    setSelectedIssues(prev =>
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
-    )
+  console.log('new issue', newIssue)
+
+  const resetNewIssue = () => {
+    setNewIssue({
+      uiSection: '',
+      description: '',
+      type: '',
+      priority: '',
+      status: '',
+    })
+    setIsAddingIssue(false)
   }
 
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedIssues(issues.map(issue => issue.id))
-    } else {
-      setSelectedIssues([])
+  const handleDragStart = (
+    event: React.DragEvent<HTMLTableRowElement>,
+    issueId: number
+  ) => {
+    event.dataTransfer.setData('text/plain', issueId.toString())
+  }
+
+  const handleDrop = (
+    event: React.DragEvent<HTMLTableRowElement>,
+    targetIssueId: number
+  ) => {
+    event.preventDefault()
+    const draggedIssueId = Number(event.dataTransfer.getData('text/plain'))
+    if (draggedIssueId !== targetIssueId) {
+      const draggedIssueIndex = issues.findIndex(
+        issue => issue.id === draggedIssueId
+      )
+      const targetIssueIndex = issues.findIndex(
+        issue => issue.id === targetIssueId
+      )
+      const updatedIssues = [...issues]
+      const [draggedIssue] = updatedIssues.splice(draggedIssueIndex, 1)
+      updatedIssues.splice(targetIssueIndex, 0, draggedIssue)
+      setIssues(updatedIssues)
     }
   }
 
-  const handleDeleteSelected = async () => {
-    try {
-      await Promise.all(selectedIssues.map(issueId => deleteIssue(Number(projectId), issueId)))
-      setIssues(prev => prev.filter(issue => !selectedIssues.includes(issue.id)))
-      setSelectedIssues([])
-    } catch (error) {
-      console.error('Failed to delete issues:', error)
-    }
-  }
-
-  const handleEditIssue = (issue: Issue) => {
-    setEditingIssue(issue.id)
+  const handleDragOver = (event: React.DragEvent<HTMLTableRowElement>) => {
+    event.preventDefault()
   }
 
   const handleUpdateIssue = async () => {
@@ -147,25 +184,77 @@ export default function IssuesPage() {
     })
   }
 
+  const handleSaveIssue = async () => {
+    if (isFormValid) {
+      try {
+        const createdIssue = await createIssue(Number(projectId), newIssue)
+        setIssues(prev => [...prev, createdIssue])
+        resetNewIssue()
+      } catch (error) {
+        console.error('Failed to create issue:', error)
+      }
+    }
+  }
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      setIsTabbing(true)
+      const formElements = Array.from(
+        editingRef.current?.querySelectorAll('input, select') || []
+      )
+      const index = formElements.indexOf(e.target as Element)
+      if (e.shiftKey) {
+        if (index > 0) {
+          (formElements[index - 1] as HTMLElement).focus()
+        } else if (index === 0) {
+          (formElements[formElements.length - 1] as HTMLElement).focus()
+        }
+      } else {
+        if (index > -1 && index < formElements.length - 1) {
+          (formElements[index + 1] as HTMLElement).focus()
+        } else if (index === formElements.length - 1) {
+          (formElements[0] as HTMLElement).focus()
+        }
+      }
+      setIsTabbing(false)
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSaveIssue()
+    }
+  }
+
+  const handleCancelEdit = () => {
+    resetNewIssue()
+  }
+
+  const editableCellClass = 'bg-blue-100'
+
+  const handleToggleHighlight = () => {
+    setHighlightCompleted(prev => !prev)
+  }
+
   return (
     <div className='flex flex-col h-full bg-background'>
       <main className='flex-1 p-8 bg-background text-foreground overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues</h1>
+        <div className='mb-4'>
+          <label className='flex items-center'>
+            <input
+              type='checkbox'
+              checked={highlightCompleted}
+              onChange={handleToggleHighlight}
+              className='mr-2'
+            />
+            Highlight Completed Issues
+          </label>
+        </div>
         <div className='bg-card shadow-md rounded-lg overflow-hidden'>
           <table className='min-w-full divide-y divide-border text-sm'>
             <thead className='bg-muted'>
               <tr>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
-                  <input
-                    type='checkbox'
-                    onChange={handleSelectAll}
-                    checked={
-                      issues.length > 0 &&
-                      selectedIssues.length === issues.length
-                    }
-                    className='form-checkbox h-4 w-4 text-primary'
-                  />
-                </th>
                 <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   UI Section
                 </th>
@@ -181,127 +270,108 @@ export default function IssuesPage() {
                 <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Status
                 </th>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className='bg-background divide-y divide-border'>
               {issues.map(issue => (
-                <tr key={issue.id} className='hover:bg-gray-100 dark:hover:bg-gray-700'>
-                  <td className='px-4 py-2 whitespace-nowrap'>
-                    <input
-                      type='checkbox'
-                      checked={selectedIssues.includes(issue.id)}
-                      onChange={() => handleCheckboxChange(issue.id)}
-                      className='form-checkbox h-4 w-4 text-primary'
-                    />
+                <tr
+                  key={issue.id}
+                  draggable
+                  onDragStart={e => handleDragStart(e, issue.id)}
+                  onDrop={e => handleDrop(e, issue.id)}
+                  onDragOver={handleDragOver}
+                  className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                    editingIssue === issue.id ? 'bg-yellow-100' : ''
+                  } ${
+                    highlightCompleted && issue.status === 'Completed' ? 'bg-green-900 bg-opacity-20 dark:bg-green-800 dark:bg-opacity-40' : ''
+                  }`}
+                >
+                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    {issue.uiSection}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
-                    {editingIssue === issue.id ? (
-                      <input
-                        type='text'
-                        name='uiSection'
-                        value={issue.uiSection}
-                        onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
-                      />
-                    ) : (
-                      issue.uiSection
-                    )}
+                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    {issue.description}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
-                    {editingIssue === issue.id ? (
-                      <input
-                        type='text'
-                        name='description'
-                        value={issue.description}
-                        onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
-                      />
-                    ) : (
-                      issue.description
-                    )}
+                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    {issue.type}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
-                    {editingIssue === issue.id ? (
-                      <select
-                        name='type'
-                        value={issue.type}
-                        onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
-                      >
-                        <option value='Enhancement'>Enhancement</option>
-                        <option value='Bug'>Bug</option>
-                        <option value='Feature'>Feature</option>
-                      </select>
-                    ) : (
-                      issue.type
-                    )}
+                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    {issue.priority}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
-                    {editingIssue === issue.id ? (
-                      <select
-                        name='priority'
-                        value={issue.priority}
-                        onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
-                      >
-                        <option value='Low'>Low</option>
-                        <option value='Medium'>Medium</option>
-                        <option value='High'>High</option>
-                      </select>
-                    ) : (
-                      issue.priority
-                    )}
+                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    {issue.status}
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 flex space-x-2 ${
+                      editingIssue === issue.id ? 'bg-yellow-100' : ''
+                    }`}
+                  >
                     {editingIssue === issue.id ? (
-                      <select
-                        name='status'
-                        value={issue.status}
-                        onChange={e => handleInputChange(e, issue.id)}
-                        className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
-                      >
-                        <option value='Planned'>Planned</option>
-                        <option value='In Progress'>In Progress</option>
-                        <option value='Completed'>Completed</option>
-                      </select>
-                    ) : (
-                      issue.status
-                    )}
+                      <>
+                        <button
+                          onClick={handleCancelEdit}
+                          className='px-2 py-1 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                        >
+                          <FaTimes />
+                        </button>
+                        <button
+                          onClick={handleUpdateIssue}
+                          className='px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90'
+                        >
+                          <FaCheck />
+                        </button>
+                        <span className='text-yellow-600 font-semibold'>
+                          Editando...
+                        </span>
+                      </>
+                    ) : null}
                   </td>
                 </tr>
               ))}
               {isAddingIssue && (
-                <tr>
-                  <td className='px-4 py-2 whitespace-nowrap'></td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                <tr ref={editingRef} className={`${editableCellClass} dark:bg-gray-800`}>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
                     <input
+                      ref={firstInputRef}
                       type='text'
                       name='uiSection'
                       value={newIssue.uiSection}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
+                      onKeyDown={handleKeyDown}
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
                       placeholder='UI Section'
                     />
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
                     <input
                       type='text'
                       name='description'
                       value={newIssue.description}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
+                      onKeyDown={handleKeyDown}
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
                       placeholder='Description'
                     />
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
                     <select
                       name='type'
                       value={newIssue.type}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
+                      onKeyDown={handleKeyDown}
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
                     >
                       <option value=''>Select Type</option>
                       <option value='Enhancement'>Enhancement</option>
@@ -309,13 +379,16 @@ export default function IssuesPage() {
                       <option value='Feature'>Feature</option>
                     </select>
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
                     <select
                       name='priority'
                       value={newIssue.priority}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
+                      onKeyDown={handleKeyDown}
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
                     >
                       <option value=''>Select Priority</option>
                       <option value='Low'>Low</option>
@@ -323,13 +396,16 @@ export default function IssuesPage() {
                       <option value='High'>High</option>
                     </select>
                   </td>
-                  <td className='px-4 py-2 whitespace-nowrap'>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
                     <select
                       name='status'
                       value={newIssue.status}
                       onChange={handleInputChange}
                       onBlur={handleBlur}
-                      className='bg-input text-foreground px-2 py-1 w-full rounded-md text-sm'
+                      onKeyDown={handleKeyDown}
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
                     >
                       <option value=''>Select Status</option>
                       <option value='Planned'>Planned</option>
@@ -337,11 +413,52 @@ export default function IssuesPage() {
                       <option value='Completed'>Completed</option>
                     </select>
                   </td>
+                  <td
+                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                  >
+                    {isFormValid ? (
+                      <>
+                        <button
+                          onClick={handleCancelAddIssue}
+                          className='px-2 py-1 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                        >
+                          <FaTimes />
+                        </button>
+                        <button
+                          onClick={handleSaveIssue}
+                          className='px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90'
+                        >
+                          OK
+                        </button>
+                        <span className='text-green-600 font-semibold'>
+                          Fields complete
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleCancelAddIssue}
+                          className='px-2 py-1 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                        >
+                          <FaTimes />
+                        </button>
+                        <span className='text-yellow-600 font-semibold'>
+                          Editing...
+                        </span>
+                      </>
+                    )}
+                  </td>
                 </tr>
               )}
               {!isAddingIssue && (
-                <tr onClick={handleRowClick} className='bg-blue-500'>
-                  <td colSpan={6} className='px-4 py-2 whitespace-nowrap text-center text-white text-sm'>
+                <tr
+                  onClick={handleRowClick}
+                  className='bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-400'
+                >
+                  <td
+                    colSpan={6}
+                    className='px-4 py-2 whitespace-nowrap text-center text-white text-sm'
+                  >
                     Add Issue
                   </td>
                 </tr>
