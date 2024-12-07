@@ -84,7 +84,9 @@ export default function IssuesPage() {
   }, [projectId])
 
   useEffect(() => {
-    setIsFormValid(newIssue.uiSection.trim() !== '' && newIssue.description.trim() !== '')
+    setIsFormValid(
+      newIssue.uiSection.trim() !== '' && newIssue.description.trim() !== ''
+    )
   }, [newIssue])
 
   useEffect(() => {
@@ -104,17 +106,24 @@ export default function IssuesPage() {
     }
   }, [editingIssue, issues])
 
-  const handleInputChange = (
+  const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     issueId?: number
   ) => {
     const { name, value } = e.target
     if (issueId !== undefined) {
-      setIssues(prev =>
-        prev.map(issue =>
+      setIssues(prev => {
+        const updatedIssues = prev.map(issue =>
           issue.id === issueId ? { ...issue, [name]: value } : issue
         )
-      )
+        const updatedIssue = updatedIssues.find(issue => issue.id === issueId)
+        if (updatedIssue) {
+          updateIssue(Number(projectId), issueId, updatedIssue)
+            .then(() => console.log('Issue updated successfully'))
+            .catch(error => console.error('Failed to update issue:', error))
+        }
+        return updatedIssues
+      })
     } else {
       setNewIssue(prev => ({ ...prev, [name]: value }))
     }
@@ -313,7 +322,9 @@ export default function IssuesPage() {
                 checked={highlightCompleted}
                 onCheckedChange={handleToggleHighlightCompleted}
                 className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightCompleted ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                  highlightCompleted
+                    ? 'bg-blue-500 dark:bg-blue-700'
+                    : 'bg-gray-200 dark:bg-gray-500'
                 }`}
                 style={{ transform: 'scale(0.8)' }}
               />
@@ -326,7 +337,9 @@ export default function IssuesPage() {
                 checked={highlightInProgress}
                 onCheckedChange={handleToggleHighlightInProgress}
                 className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightInProgress ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                  highlightInProgress
+                    ? 'bg-blue-500 dark:bg-blue-700'
+                    : 'bg-gray-200 dark:bg-gray-500'
                 }`}
                 style={{ transform: 'scale(0.8)' }}
               />
@@ -339,7 +352,9 @@ export default function IssuesPage() {
                 checked={highlightPlanned}
                 onCheckedChange={handleToggleHighlightPlanned}
                 className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightPlanned ? 'bg-yellow-500 dark:bg-yellow-700' : 'bg-gray-200 dark:bg-gray-500'
+                  highlightPlanned
+                    ? 'bg-yellow-500 dark:bg-yellow-700'
+                    : 'bg-gray-200 dark:bg-gray-500'
                 }`}
                 style={{ transform: 'scale(0.8)' }}
               />
@@ -355,7 +370,9 @@ export default function IssuesPage() {
                 checked={sortCompletedToTop}
                 onCheckedChange={handleToggleSortCompletedToTop}
                 className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  sortCompletedToTop ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                  sortCompletedToTop
+                    ? 'bg-blue-500 dark:bg-blue-700'
+                    : 'bg-gray-200 dark:bg-gray-500'
                 }`}
                 style={{ transform: 'scale(0.8)' }}
               />
@@ -423,21 +440,36 @@ export default function IssuesPage() {
                     <Selector
                       statuses={['Enhancement', 'Bug', 'Feature']}
                       initialStatus={issue.type}
-                      onChange={(status) => handleInputChange({ target: { name: 'type', value: status } }, issue.id)}
+                      onChange={status =>
+                        handleInputChange(
+                          { target: { name: 'type', value: status } },
+                          issue.id
+                        )
+                      }
                     />
                   </td>
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
                     <Selector
                       statuses={['Low', 'Medium', 'High']}
                       initialStatus={issue.priority}
-                      onChange={(status) => handleInputChange({ target: { name: 'priority', value: status } }, issue.id)}
+                      onChange={status =>
+                        handleInputChange(
+                          { target: { name: 'priority', value: status } },
+                          issue.id
+                        )
+                      }
                     />
                   </td>
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
                     <Selector
                       statuses={['Planned', 'In Progress', 'Completed']}
                       initialStatus={issue.status}
-                      onChange={(status) => handleInputChange({ target: { name: 'status', value: status } }, issue.id)}
+                      onChange={status =>
+                        handleInputChange(
+                          { target: { name: 'status', value: status } },
+                          issue.id
+                        )
+                      }
                     />
                   </td>
                   <td
@@ -507,7 +539,11 @@ export default function IssuesPage() {
                     <Selector
                       statuses={['Enhancement', 'Bug', 'Feature']}
                       initialStatus={newIssue.type}
-                      onChange={(status) => handleInputChange({ target: { name: 'type', value: status } })}
+                      onChange={status =>
+                        handleInputChange({
+                          target: { name: 'type', value: status },
+                        })
+                      }
                     />
                   </td>
                   <td
@@ -516,7 +552,11 @@ export default function IssuesPage() {
                     <Selector
                       statuses={['Low', 'Medium', 'High']}
                       initialStatus={newIssue.priority}
-                      onChange={(status) => handleInputChange({ target: { name: 'priority', value: status } })}
+                      onChange={status =>
+                        handleInputChange({
+                          target: { name: 'priority', value: status },
+                        })
+                      }
                     />
                   </td>
                   <td
@@ -525,7 +565,11 @@ export default function IssuesPage() {
                     <Selector
                       statuses={['Planned', 'In Progress', 'Completed']}
                       initialStatus={newIssue.status}
-                      onChange={(status) => handleInputChange({ target: { name: 'status', value: status } })}
+                      onChange={status =>
+                        handleInputChange({
+                          target: { name: 'status', value: status },
+                        })
+                      }
                     />
                   </td>
                   <td
@@ -568,7 +612,7 @@ export default function IssuesPage() {
               {!isAddingIssue && (
                 <tr
                   onClick={handleRowClick}
-                  className='bg-blue-500 hover:bg-blue-600 dark:hover:bg-blue-400'
+                  className='bg-blue-400 hover:bg-blue-500 dark:bg-blue-800 dark:hover:bg-blue-700'
                 >
                   <td
                     colSpan={6}
