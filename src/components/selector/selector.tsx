@@ -44,13 +44,13 @@ export const Selector = ({ statuses, initialStatus, onChange }: SelectorProps) =
           <button
             key={status}
             onClick={() => handleStatusClick(status)}
-            className={`w-5 h-5 rounded-full ${
+            className={`w-5 h-5 rounded-full transition-colors duration-200 ${
               getStatusColor(status, selectedStatus === status)
             } ${
               selectedStatus === status 
                 ? 'ring-black dark:ring-white'
                 : ''
-            }`}
+            } hover:opacity-75`}
             aria-label={status}
           />
         ))}
