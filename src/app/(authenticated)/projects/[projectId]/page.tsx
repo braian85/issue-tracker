@@ -69,6 +69,7 @@ export default function IssuesPage() {
     const savedSort = localStorage.getItem('sortCompletedToTop')
     return savedSort ? JSON.parse(savedSort) : false
   })
+  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -306,6 +307,35 @@ export default function IssuesPage() {
     })
   }
 
+  const handleCellClick = (issueId: number, field: string) => {
+    setEditingCell({ id: issueId, field })
+  }
+
+  const handleCellBlur = async (issueId: number) => {
+    const updatedIssue = issues.find(issue => issue.id === issueId)
+    if (updatedIssue) {
+      try {
+        await updateIssue(Number(projectId), issueId, updatedIssue)
+        console.log('Issue updated successfully')
+      } catch (error) {
+        console.error('Failed to update issue:', error)
+      }
+    }
+    setEditingCell(null)
+  }
+
+  const handleCellChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    issueId: number
+  ) => {
+    const { name, value } = e.target
+    setIssues(prev =>
+      prev.map(issue =>
+        issue.id === issueId ? { ...issue, [name]: value } : issue
+      )
+    )
+  }
+
   const sortedIssues = sortCompletedToTop
     ? [...issues].sort((a, b) => (a.status === 'Completed' ? -1 : 1))
     : issues
@@ -353,7 +383,7 @@ export default function IssuesPage() {
                 onCheckedChange={handleToggleHighlightPlanned}
                 className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
                   highlightPlanned
-                    ? 'bg-yellow-500 dark:bg-yellow-700'
+                    ? 'bg-blue-500 dark:bg-blue-700'
                     : 'bg-gray-200 dark:bg-gray-500'
                 }`}
                 style={{ transform: 'scale(0.8)' }}
@@ -407,98 +437,135 @@ export default function IssuesPage() {
               </tr>
             </thead>
             <tbody className='bg-background divide-y divide-border dark:divide-gray-500'>
-              {sortedIssues.map(issue => (
-                <tr
-                  key={issue.id}
-                  draggable
-                  onDragStart={e => handleDragStart(e, issue.id)}
-                  onDrop={e => handleDrop(e, issue.id)}
-                  onDragOver={handleDragOver}
-                  className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                    editingIssue === issue.id ? 'bg-yellow-100' : ''
-                  } ${
-                    highlightCompleted && issue.status === 'Completed'
-                      ? 'bg-green-900 bg-opacity-20 dark:bg-green-800 dark:bg-opacity-40'
-                      : ''
-                  } ${
-                    highlightInProgress && issue.status === 'In Progress'
-                      ? 'bg-blue-900 bg-opacity-20 dark:bg-blue-800 dark:bg-opacity-40'
-                      : ''
-                  } ${
-                    highlightPlanned && issue.status === 'Planned'
-                      ? 'bg-yellow-900 bg-opacity-20 dark:bg-yellow-800 dark:bg-opacity-40'
-                      : ''
-                  }`}
-                >
-                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    {issue.uiSection}
-                  </td>
-                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    {issue.description}
-                  </td>
-                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    <Selector
-                      statuses={['Enhancement', 'Bug', 'Feature']}
-                      initialStatus={issue.type}
-                      onChange={status =>
-                        handleInputChange(
-                          { target: { name: 'type', value: status } },
-                          issue.id
-                        )
-                      }
-                    />
-                  </td>
-                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    <Selector
-                      statuses={['Low', 'Medium', 'High']}
-                      initialStatus={issue.priority}
-                      onChange={status =>
-                        handleInputChange(
-                          { target: { name: 'priority', value: status } },
-                          issue.id
-                        )
-                      }
-                    />
-                  </td>
-                  <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    <Selector
-                      statuses={['Planned', 'In Progress', 'Completed']}
-                      initialStatus={issue.status}
-                      onChange={status =>
-                        handleInputChange(
-                          { target: { name: 'status', value: status } },
-                          issue.id
-                        )
-                      }
-                    />
-                  </td>
-                  <td
-                    className={`px-4 py-2 whitespace-nowrap w-1/5 flex space-x-2 ${
-                      editingIssue === issue.id ? 'bg-yellow-100' : ''
-                    }`}
+              {sortedIssues.map(issue => {
+                let rowHighlightClass = ''
+                if (highlightCompleted && issue.status === 'Completed') {
+                  rowHighlightClass = 'bg-green-200 dark:bg-green-900'
+                } else if (highlightInProgress && issue.status === 'In Progress') {
+                  rowHighlightClass = 'bg-blue-200 dark:bg-blue-900'
+                } else if (highlightPlanned && issue.status === 'Planned') {
+                  rowHighlightClass = 'bg-yellow-200 dark:bg-yellow-900'
+                }
+
+                return (
+                  <tr
+                    key={issue.id}
+                    draggable
+                    onDragStart={e => handleDragStart(e, issue.id)}
+                    onDrop={e => handleDrop(e, issue.id)}
+                    onDragOver={handleDragOver}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-700 h-10 ${rowHighlightClass}`}
                   >
-                    {editingIssue === issue.id ? (
-                      <>
-                        <button
-                          onClick={handleCancelEdit}
-                          className='px-2 py-1 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                        >
-                          <FaTimes />
-                        </button>
-                        <button
-                          onClick={handleUpdateIssue}
-                          className='px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90'
-                        >
-                          <FaCheck />
-                        </button>
-                        <span className='text-yellow-600 font-semibold'>
-                          Editando...
-                        </span>
-                      </>
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
+                    <td
+                      className={`px-4 py-2 whitespace-nowrap w-1/5 ${
+                        editingCell?.id === issue.id && editingCell.field === 'uiSection'
+                          ? 'bg-blue-200 dark:bg-blue-800'
+                          : ''
+                      }`}
+                      onClick={() => handleCellClick(issue.id, 'uiSection')}
+                    >
+                      {editingCell?.id === issue.id && editingCell.field === 'uiSection' ? (
+                        <input
+                          type='text'
+                          name='uiSection'
+                          value={issue.uiSection}
+                          onChange={e => handleCellChange(e, issue.id)}
+                          onBlur={() => handleCellBlur(issue.id)}
+                          onFocus={e => e.target.select()}
+                          className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
+                          autoFocus
+                        />
+                      ) : (
+                        issue.uiSection
+                      )}
+                    </td>
+                    <td
+                      className={`px-4 py-2 whitespace-nowrap w-1/5 ${
+                        editingCell?.id === issue.id && editingCell.field === 'description'
+                          ? 'bg-blue-200 dark:bg-blue-800'
+                          : ''
+                      }`}
+                      onClick={() => handleCellClick(issue.id, 'description')}
+                    >
+                      {editingCell?.id === issue.id && editingCell.field === 'description' ? (
+                        <input
+                          type='text'
+                          name='description'
+                          value={issue.description}
+                          onChange={e => handleCellChange(e, issue.id)}
+                          onBlur={() => handleCellBlur(issue.id)}
+                          onFocus={e => e.target.select()}
+                          className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
+                          autoFocus
+                        />
+                      ) : (
+                        issue.description
+                      )}
+                    </td>
+                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                      <Selector
+                        statuses={['Enhancement', 'Bug', 'Feature']}
+                        initialStatus={issue.type}
+                        onChange={status =>
+                          handleInputChange(
+                            { target: { name: 'type', value: status } },
+                            issue.id
+                          )
+                        }
+                      />
+                    </td>
+                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                      <Selector
+                        statuses={['Low', 'Medium', 'High']}
+                        initialStatus={issue.priority}
+                        onChange={status =>
+                          handleInputChange(
+                            { target: { name: 'priority', value: status } },
+                            issue.id
+                          )
+                        }
+                      />
+                    </td>
+                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                      <Selector
+                        statuses={['Planned', 'In Progress', 'Completed']}
+                        initialStatus={issue.status}
+                        onChange={status =>
+                          handleInputChange(
+                            { target: { name: 'status', value: status } },
+                            issue.id
+                          )
+                        }
+                      />
+                    </td>
+                    <td
+                      className={`px-4 py-2 whitespace-nowrap w-1/5 flex space-x-2 ${
+                        editingIssue === issue.id ? 'bg-yellow-100' : ''
+                      }`}
+                    >
+                      {editingIssue === issue.id ? (
+                        <>
+                          <button
+                            onClick={handleCancelEdit}
+                            className='px-2 py-1 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                          >
+                            <FaTimes />
+                          </button>
+                          <button
+                            onClick={handleUpdateIssue}
+                            className='px-2 py-1 rounded bg-primary text-primary-foreground hover:bg-primary/90'
+                          >
+                            <FaCheck />
+                          </button>
+                          <span className='text-yellow-600 font-semibold'>
+                            Editando...
+                          </span>
+                        </>
+                      ) : null}
+                    </td>
+                  </tr>
+                )
+              })}
               {isAddingIssue && (
                 <tr
                   ref={editingRef}
