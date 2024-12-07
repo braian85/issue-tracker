@@ -8,18 +8,18 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className='w-64 bg-white dark:bg-gray-900 border-r-2 border-gray-300 dark:border-gray-700 shadow-lg h-screen overflow-y-auto flex flex-col'>
+    <aside className='w-64 bg-white dark:bg-background border-r-2 border-gray-300 dark:border-gray-700 shadow-lg h-screen overflow-y-auto flex flex-col'>
       <div className='p-4 flex-shrink-0'>
         <IssueTrackerLogo />
       </div>
       <nav className='mt-8 flex-grow'>
-        <Link href='/dashboard' className='block py-2 px-4 text-blue-900 dark:text-blue-300 hover:bg-blue-300 dark:hover:bg-gray-800'>
+        <Link href='/dashboard' className='block py-2 px-4 text-black dark:text-white hover:bg-blue-300 dark:hover:bg-gray-800'>
           Dashboard
         </Link>
-        <Link href='/projects' className='block py-2 px-4 text-blue-900 dark:text-blue-300 hover:bg-blue-300 dark:hover:bg-gray-800'>
+        <Link href='/projects' className='block py-2 px-4 text-black dark:text-white hover:bg-blue-300 dark:hover:bg-gray-800'>
           Projects
         </Link>
-        <Link href='/settings' className='block py-2 px-4 text-blue-900 dark:text-blue-300 hover:bg-blue-300 dark:hover:bg-gray-800'>
+        <Link href='/settings' className='block py-2 px-4 text-black dark:text-white hover:bg-blue-300 dark:hover:bg-gray-800'>
           Settings
         </Link>
       </nav>

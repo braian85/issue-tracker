@@ -69,7 +69,10 @@ export default function IssuesPage() {
     const savedSort = localStorage.getItem('sortCompletedToTop')
     return savedSort ? JSON.parse(savedSort) : false
   })
-  const [editingCell, setEditingCell] = useState<{ id: number; field: string } | null>(null)
+  const [editingCell, setEditingCell] = useState<{
+    id: number
+    field: string
+  } | null>(null)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -105,13 +108,37 @@ export default function IssuesPage() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [editingIssue, issues])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [issues])
 
   const handleInputChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     issueId?: number
   ) => {
     const { name, value } = e.target
+    if (issueId !== undefined) {
+      setIssues(prev => {
+        const updatedIssues = prev.map(issue =>
+          issue.id === issueId ? { ...issue, [name]: value } : issue
+        )
+        const updatedIssue = updatedIssues.find(issue => issue.id === issueId)
+        if (updatedIssue) {
+          updateIssue(Number(projectId), issueId, updatedIssue)
+            .then(() => console.log('Issue updated successfully'))
+            .catch(error => console.error('Failed to update issue:', error))
+        }
+        return updatedIssues
+      })
+    } else {
+      setNewIssue(prev => ({ ...prev, [name]: value }))
+    }
+  }
+
+  const handleSelectorChange = (
+    name: string,
+    value: string,
+    issueId?: number
+  ) => {
     if (issueId !== undefined) {
       setIssues(prev => {
         const updatedIssues = prev.map(issue =>
@@ -249,17 +276,20 @@ export default function IssuesPage() {
         editingRef.current?.querySelectorAll('input, select') || []
       )
       const index = formElements.indexOf(e.target as Element)
-      if (e.shiftKey) {
-        if (index > 0) {
-          ;(formElements[index - 1] as HTMLElement).focus()
-        } else if (index === 0) {
-          ;(formElements[formElements.length - 1] as HTMLElement).focus()
-        }
-      } else {
-        if (index > -1 && index < formElements.length - 1) {
-          ;(formElements[index + 1] as HTMLElement).focus()
-        } else if (index === formElements.length - 1) {
-          ;(formElements[0] as HTMLElement).focus()
+
+      if (formElements.length > 0) {
+        if (e.shiftKey) {
+          if (index > 0) {
+            ;(formElements[index - 1] as HTMLElement).focus()
+          } else if (index === 0) {
+            ;(formElements[formElements.length - 1] as HTMLElement).focus()
+          }
+        } else {
+          if (index > -1 && index < formElements.length - 1) {
+            ;(formElements[index + 1] as HTMLElement).focus()
+          } else if (index === formElements.length - 1) {
+            ;(formElements[0] as HTMLElement).focus()
+          }
         }
       }
       setIsTabbing(false)
@@ -276,7 +306,7 @@ export default function IssuesPage() {
   const editableCellClass = 'bg-blue-100'
 
   const handleToggleHighlightCompleted = () => {
-    setHighlightCompleted(prev => {
+    setHighlightCompleted((prev: boolean) => {
       const newValue = !prev
       localStorage.setItem('highlightCompleted', JSON.stringify(newValue))
       return newValue
@@ -284,7 +314,7 @@ export default function IssuesPage() {
   }
 
   const handleToggleHighlightInProgress = () => {
-    setHighlightInProgress(prev => {
+    setHighlightInProgress((prev: boolean) => {
       const newValue = !prev
       localStorage.setItem('highlightInProgress', JSON.stringify(newValue))
       return newValue
@@ -292,7 +322,7 @@ export default function IssuesPage() {
   }
 
   const handleToggleHighlightPlanned = () => {
-    setHighlightPlanned(prev => {
+    setHighlightPlanned((prev: boolean) => {
       const newValue = !prev
       localStorage.setItem('highlightPlanned', JSON.stringify(newValue))
       return newValue
@@ -300,7 +330,7 @@ export default function IssuesPage() {
   }
 
   const handleToggleSortCompletedToTop = () => {
-    setSortCompletedToTop(prev => {
+    setSortCompletedToTop((prev: boolean) => {
       const newValue = !prev
       localStorage.setItem('sortCompletedToTop', JSON.stringify(newValue))
       return newValue
@@ -334,6 +364,37 @@ export default function IssuesPage() {
         issue.id === issueId ? { ...issue, [name]: value } : issue
       )
     )
+  }
+
+  const handleCellKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    issueId: number,
+    field: string
+  ) => {
+    const formElements = Array.from(
+      editingRef.current?.querySelectorAll('input, select') || []
+    )
+    const index = formElements.indexOf(e.target as Element)
+
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      if (e.shiftKey) {
+        if (index > 0) {
+          ;(formElements[index - 1] as HTMLElement).focus()
+        } else if (index === 0) {
+          ;(formElements[formElements.length - 1] as HTMLElement).focus()
+        }
+      } else {
+        if (index > -1 && index < formElements.length - 1) {
+          ;(formElements[index + 1] as HTMLElement).focus()
+        } else if (index === formElements.length - 1) {
+          ;(formElements[0] as HTMLElement).focus()
+        }
+      }
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      handleCellBlur(issueId)
+    }
   }
 
   const sortedIssues = sortCompletedToTop
@@ -441,7 +502,10 @@ export default function IssuesPage() {
                 let rowHighlightClass = ''
                 if (highlightCompleted && issue.status === 'Completed') {
                   rowHighlightClass = 'bg-green-200 dark:bg-green-900'
-                } else if (highlightInProgress && issue.status === 'In Progress') {
+                } else if (
+                  highlightInProgress &&
+                  issue.status === 'In Progress'
+                ) {
                   rowHighlightClass = 'bg-blue-200 dark:bg-blue-900'
                 } else if (highlightPlanned && issue.status === 'Planned') {
                   rowHighlightClass = 'bg-yellow-200 dark:bg-yellow-900'
@@ -458,13 +522,15 @@ export default function IssuesPage() {
                   >
                     <td
                       className={`px-4 py-2 whitespace-nowrap w-1/5 ${
-                        editingCell?.id === issue.id && editingCell.field === 'uiSection'
+                        editingCell?.id === issue.id &&
+                        editingCell.field === 'uiSection'
                           ? 'bg-blue-200 dark:bg-blue-800'
                           : ''
                       }`}
                       onClick={() => handleCellClick(issue.id, 'uiSection')}
                     >
-                      {editingCell?.id === issue.id && editingCell.field === 'uiSection' ? (
+                      {editingCell?.id === issue.id &&
+                      editingCell.field === 'uiSection' ? (
                         <input
                           type='text'
                           name='uiSection'
@@ -472,6 +538,9 @@ export default function IssuesPage() {
                           onChange={e => handleCellChange(e, issue.id)}
                           onBlur={() => handleCellBlur(issue.id)}
                           onFocus={e => e.target.select()}
+                          onKeyDown={e =>
+                            handleCellKeyDown(e, issue.id, 'uiSection')
+                          }
                           className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
                           autoFocus
                         />
@@ -481,13 +550,15 @@ export default function IssuesPage() {
                     </td>
                     <td
                       className={`px-4 py-2 whitespace-nowrap w-1/5 ${
-                        editingCell?.id === issue.id && editingCell.field === 'description'
+                        editingCell?.id === issue.id &&
+                        editingCell.field === 'description'
                           ? 'bg-blue-200 dark:bg-blue-800'
                           : ''
                       }`}
                       onClick={() => handleCellClick(issue.id, 'description')}
                     >
-                      {editingCell?.id === issue.id && editingCell.field === 'description' ? (
+                      {editingCell?.id === issue.id &&
+                      editingCell.field === 'description' ? (
                         <input
                           type='text'
                           name='description'
@@ -495,6 +566,9 @@ export default function IssuesPage() {
                           onChange={e => handleCellChange(e, issue.id)}
                           onBlur={() => handleCellBlur(issue.id)}
                           onFocus={e => e.target.select()}
+                          onKeyDown={e =>
+                            handleCellKeyDown(e, issue.id, 'description')
+                          }
                           className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
                           autoFocus
                         />
@@ -507,10 +581,7 @@ export default function IssuesPage() {
                         statuses={['Enhancement', 'Bug', 'Feature']}
                         initialStatus={issue.type}
                         onChange={status =>
-                          handleInputChange(
-                            { target: { name: 'type', value: status } },
-                            issue.id
-                          )
+                          handleSelectorChange('type', status, issue.id)
                         }
                       />
                     </td>
@@ -519,10 +590,7 @@ export default function IssuesPage() {
                         statuses={['Low', 'Medium', 'High']}
                         initialStatus={issue.priority}
                         onChange={status =>
-                          handleInputChange(
-                            { target: { name: 'priority', value: status } },
-                            issue.id
-                          )
+                          handleSelectorChange('priority', status, issue.id)
                         }
                       />
                     </td>
@@ -531,10 +599,7 @@ export default function IssuesPage() {
                         statuses={['Planned', 'In Progress', 'Completed']}
                         initialStatus={issue.status}
                         onChange={status =>
-                          handleInputChange(
-                            { target: { name: 'status', value: status } },
-                            issue.id
-                          )
+                          handleSelectorChange('status', status, issue.id)
                         }
                       />
                     </td>
@@ -606,11 +671,7 @@ export default function IssuesPage() {
                     <Selector
                       statuses={['Enhancement', 'Bug', 'Feature']}
                       initialStatus={newIssue.type}
-                      onChange={status =>
-                        handleInputChange({
-                          target: { name: 'type', value: status },
-                        })
-                      }
+                      onChange={status => handleSelectorChange('type', status)}
                     />
                   </td>
                   <td
@@ -620,9 +681,7 @@ export default function IssuesPage() {
                       statuses={['Low', 'Medium', 'High']}
                       initialStatus={newIssue.priority}
                       onChange={status =>
-                        handleInputChange({
-                          target: { name: 'priority', value: status },
-                        })
+                        handleSelectorChange('priority', status)
                       }
                     />
                   </td>
@@ -633,9 +692,7 @@ export default function IssuesPage() {
                       statuses={['Planned', 'In Progress', 'Completed']}
                       initialStatus={newIssue.status}
                       onChange={status =>
-                        handleInputChange({
-                          target: { name: 'status', value: status },
-                        })
+                        handleSelectorChange('status', status)
                       }
                     />
                   </td>
@@ -701,15 +758,15 @@ export default function IssuesPage() {
               Update Issue
             </button>
           )}
-          {selectedIssues.length > 0 && (
+          {/* {selectedIssues.length > 0 && (
             <button
               onClick={handleDeleteSelected}
               className='px-4 py-2 rounded bg-destructive text-destructive-foreground hover:bg-destructive/90'
             >
               Delete Selected
             </button>
-          )}
-          {selectedIssues.length === 1 && !editingIssue && (
+          )} */}
+          {/* {selectedIssues.length === 1 && !editingIssue && (
             <button
               onClick={() => {
                 const issue = issues.find(i => i.id === selectedIssues[0])
@@ -719,7 +776,7 @@ export default function IssuesPage() {
             >
               Edit Selected
             </button>
-          )}
+          )} */}
         </div>
       </main>
     </div>
