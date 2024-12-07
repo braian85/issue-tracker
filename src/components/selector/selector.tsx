@@ -44,7 +44,7 @@ export const Selector = ({ statuses, initialStatus, onChange }: SelectorProps) =
           <button
             key={status}
             onClick={() => handleStatusClick(status)}
-            className={`w-4 h-4 rounded-full ${
+            className={`w-5 h-5 rounded-full ${
               getStatusColor(status, selectedStatus === status)
             } ${
               selectedStatus === status 

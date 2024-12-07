@@ -57,9 +57,18 @@ export default function IssuesPage() {
     const savedHighlight = localStorage.getItem('highlightCompleted')
     return savedHighlight ? JSON.parse(savedHighlight) : false
   })
-  const [highlightInProgress, setHighlightInProgress] = useState(false)
-  const [highlightPlanned, setHighlightPlanned] = useState(false)
-  const [sortCompletedToTop, setSortCompletedToTop] = useState(false)
+  const [highlightInProgress, setHighlightInProgress] = useState(() => {
+    const savedHighlight = localStorage.getItem('highlightInProgress')
+    return savedHighlight ? JSON.parse(savedHighlight) : false
+  })
+  const [highlightPlanned, setHighlightPlanned] = useState(() => {
+    const savedHighlight = localStorage.getItem('highlightPlanned')
+    return savedHighlight ? JSON.parse(savedHighlight) : false
+  })
+  const [sortCompletedToTop, setSortCompletedToTop] = useState(() => {
+    const savedSort = localStorage.getItem('sortCompletedToTop')
+    return savedSort ? JSON.parse(savedSort) : false
+  })
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -256,10 +265,34 @@ export default function IssuesPage() {
 
   const editableCellClass = 'bg-blue-100'
 
-  const handleToggleHighlight = () => {
+  const handleToggleHighlightCompleted = () => {
     setHighlightCompleted(prev => {
       const newValue = !prev
       localStorage.setItem('highlightCompleted', JSON.stringify(newValue))
+      return newValue
+    })
+  }
+
+  const handleToggleHighlightInProgress = () => {
+    setHighlightInProgress(prev => {
+      const newValue = !prev
+      localStorage.setItem('highlightInProgress', JSON.stringify(newValue))
+      return newValue
+    })
+  }
+
+  const handleToggleHighlightPlanned = () => {
+    setHighlightPlanned(prev => {
+      const newValue = !prev
+      localStorage.setItem('highlightPlanned', JSON.stringify(newValue))
+      return newValue
+    })
+  }
+
+  const handleToggleSortCompletedToTop = () => {
+    setSortCompletedToTop(prev => {
+      const newValue = !prev
+      localStorage.setItem('sortCompletedToTop', JSON.stringify(newValue))
       return newValue
     })
   }
@@ -270,65 +303,67 @@ export default function IssuesPage() {
 
   return (
     <div className='flex flex-col h-full bg-background'>
-      <main className='flex-1 p-8 bg-background text-foreground overflow-auto'>
+      <main className='flex-1 p-4 bg-background text-foreground overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues</h1>
-        <div className='mb-4'>
-          <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
-          <label className='flex items-center'>
-            <Switch
-              checked={highlightCompleted}
-              onCheckedChange={() => handleToggleHighlight()}
-              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                highlightCompleted ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
-              }`}
-              style={{ transform: 'scale(0.8)' }}
-            />
-            <span className='text-sm text-foreground dark:text-white'>
-              Highlight Completed Issues
-            </span>
-          </label>
-          <label className='flex items-center mt-2'>
-            <Switch
-              checked={highlightInProgress}
-              onCheckedChange={() => setHighlightInProgress(prev => !prev)}
-              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                highlightInProgress ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
-              }`}
-              style={{ transform: 'scale(0.8)' }}
-            />
-            <span className='text-sm text-foreground dark:text-white'>
-              Highlight In Progress Issues
-            </span>
-          </label>
-          <label className='flex items-center mt-2'>
-            <Switch
-              checked={highlightPlanned}
-              onCheckedChange={() => setHighlightPlanned(prev => !prev)}
-              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                highlightPlanned ? 'bg-yellow-500 dark:bg-yellow-700' : 'bg-gray-200 dark:bg-gray-500'
-              }`}
-              style={{ transform: 'scale(0.8)' }}
-            />
-            <span className='text-sm text-foreground dark:text-white'>
-              Highlight Planned Issues
-            </span>
-          </label>
-        </div>
-        <div className='mb-4'>
-          <h2 className='text-lg font-semibold mb-2'>Sort Options</h2>
-          <label className='flex items-center'>
-            <Switch
-              checked={sortCompletedToTop}
-              onCheckedChange={() => setSortCompletedToTop(prev => !prev)}
-              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                sortCompletedToTop ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
-              }`}
-              style={{ transform: 'scale(0.8)' }}
-            />
-            <span className='text-sm text-foreground dark:text-white'>
-              Sort Completed to Top
-            </span>
-          </label>
+        <div className='mb-4 flex flex-row space-x-4'>
+          <div>
+            <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
+            <label className='flex items-center'>
+              <Switch
+                checked={highlightCompleted}
+                onCheckedChange={handleToggleHighlightCompleted}
+                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                  highlightCompleted ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                }`}
+                style={{ transform: 'scale(0.8)' }}
+              />
+              <span className='text-sm text-foreground dark:text-white'>
+                Highlight Completed Issues
+              </span>
+            </label>
+            <label className='flex items-center mt-2'>
+              <Switch
+                checked={highlightInProgress}
+                onCheckedChange={handleToggleHighlightInProgress}
+                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                  highlightInProgress ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                }`}
+                style={{ transform: 'scale(0.8)' }}
+              />
+              <span className='text-sm text-foreground dark:text-white'>
+                Highlight In Progress Issues
+              </span>
+            </label>
+            <label className='flex items-center mt-2'>
+              <Switch
+                checked={highlightPlanned}
+                onCheckedChange={handleToggleHighlightPlanned}
+                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                  highlightPlanned ? 'bg-yellow-500 dark:bg-yellow-700' : 'bg-gray-200 dark:bg-gray-500'
+                }`}
+                style={{ transform: 'scale(0.8)' }}
+              />
+              <span className='text-sm text-foreground dark:text-white'>
+                Highlight Planned Issues
+              </span>
+            </label>
+          </div>
+          <div>
+            <h2 className='text-lg font-semibold mb-2'>Sort Options</h2>
+            <label className='flex items-center'>
+              <Switch
+                checked={sortCompletedToTop}
+                onCheckedChange={handleToggleSortCompletedToTop}
+                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                  sortCompletedToTop ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+                }`}
+                style={{ transform: 'scale(0.8)' }}
+              />
+              <span className='text-sm text-foreground dark:text-white'>
+                Sort Completed to Top
+              </span>
+            </label>
+          </div>
         </div>
         <div className='bg-card shadow-md rounded-lg overflow-hidden'>
           <table className='min-w-full divide-y divide-border text-sm'>
@@ -354,7 +389,7 @@ export default function IssuesPage() {
                 </th>
               </tr>
             </thead>
-            <tbody className='bg-background divide-y divide-border'>
+            <tbody className='bg-background divide-y divide-border dark:divide-gray-500'>
               {sortedIssues.map(issue => (
                 <tr
                   key={issue.id}
