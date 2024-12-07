@@ -9,6 +9,8 @@ import {
   deleteIssue,
 } from '@/clientAPI/projects/index'
 import { FaCheck, FaTimes } from 'react-icons/fa'
+import { Switch } from '@/components/ui/switch'
+import { Selector } from '@/components/selector/selector'
 
 interface Issue {
   id: number
@@ -17,6 +19,20 @@ interface Issue {
   type: string
   priority: string
   status: string
+}
+
+const ToggleIcon: React.FC<{ isActive: boolean; onToggle: () => void }> = ({
+  isActive,
+  onToggle,
+}) => {
+  return (
+    <button
+      onClick={onToggle}
+      className='p-2 rounded-full bg-accent text-accent-foreground'
+    >
+      {isActive ? <FaCheck size={20} /> : <FaTimes size={20} />}
+    </button>
+  )
 }
 
 export default function IssuesPage() {
@@ -37,7 +53,11 @@ export default function IssuesPage() {
   const editingRef = useRef<HTMLTableRowElement>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [isTabbing, setIsTabbing] = useState(false)
-  const [highlightCompleted, setHighlightCompleted] = useState(false)
+  const [highlightCompleted, setHighlightCompleted] = useState(() => {
+    const savedHighlight = localStorage.getItem('highlightCompleted')
+    return savedHighlight ? JSON.parse(savedHighlight) : false
+  })
+  const [sortCompletedToTop, setSortCompletedToTop] = useState(false)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -96,7 +116,9 @@ export default function IssuesPage() {
     }, 0)
   }
 
-  const handleBlur = async (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleBlur = async (
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     if (!isTabbing && !editingRef.current?.contains(e.relatedTarget as Node)) {
       if (isFormValid) {
         try {
@@ -208,15 +230,15 @@ export default function IssuesPage() {
       const index = formElements.indexOf(e.target as Element)
       if (e.shiftKey) {
         if (index > 0) {
-          (formElements[index - 1] as HTMLElement).focus()
+          ;(formElements[index - 1] as HTMLElement).focus()
         } else if (index === 0) {
-          (formElements[formElements.length - 1] as HTMLElement).focus()
+          ;(formElements[formElements.length - 1] as HTMLElement).focus()
         }
       } else {
         if (index > -1 && index < formElements.length - 1) {
-          (formElements[index + 1] as HTMLElement).focus()
+          ;(formElements[index + 1] as HTMLElement).focus()
         } else if (index === formElements.length - 1) {
-          (formElements[0] as HTMLElement).focus()
+          ;(formElements[0] as HTMLElement).focus()
         }
       }
       setIsTabbing(false)
@@ -233,8 +255,16 @@ export default function IssuesPage() {
   const editableCellClass = 'bg-blue-100'
 
   const handleToggleHighlight = () => {
-    setHighlightCompleted(prev => !prev)
+    setHighlightCompleted(prev => {
+      const newValue = !prev
+      localStorage.setItem('highlightCompleted', JSON.stringify(newValue))
+      return newValue
+    })
   }
+
+  const sortedIssues = sortCompletedToTop
+    ? [...issues].sort((a, b) => (a.status === 'Completed' ? -1 : 1))
+    : issues
 
   return (
     <div className='flex flex-col h-full bg-background'>
@@ -242,13 +272,28 @@ export default function IssuesPage() {
         <h1 className='text-2xl font-bold mb-6'>Issues</h1>
         <div className='mb-4'>
           <label className='flex items-center'>
-            <input
-              type='checkbox'
+            <Switch
               checked={highlightCompleted}
-              onChange={handleToggleHighlight}
-              className='mr-2'
+              onCheckedChange={() => handleToggleHighlight()}
+              className={`mr-2 transition-colors duration-200 ease-in-out rounded-full ${
+                highlightCompleted ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+              }`}
             />
-            Highlight Completed Issues
+            <span className='text-foreground dark:text-white'>
+              Highlight Completed Issues
+            </span>
+          </label>
+          <label className='flex items-center mt-2'>
+            <Switch
+              checked={sortCompletedToTop}
+              onCheckedChange={() => setSortCompletedToTop(prev => !prev)}
+              className={`mr-2 transition-colors duration-200 ease-in-out rounded-full ${
+                sortCompletedToTop ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+              }`}
+            />
+            <span className='text-foreground dark:text-white'>
+              Sort Completed to Top
+            </span>
           </label>
         </div>
         <div className='bg-card shadow-md rounded-lg overflow-hidden'>
@@ -276,7 +321,7 @@ export default function IssuesPage() {
               </tr>
             </thead>
             <tbody className='bg-background divide-y divide-border'>
-              {issues.map(issue => (
+              {sortedIssues.map(issue => (
                 <tr
                   key={issue.id}
                   draggable
@@ -286,7 +331,9 @@ export default function IssuesPage() {
                   className={`hover:bg-gray-100 dark:hover:bg-gray-700 ${
                     editingIssue === issue.id ? 'bg-yellow-100' : ''
                   } ${
-                    highlightCompleted && issue.status === 'Completed' ? 'bg-green-900 bg-opacity-20 dark:bg-green-800 dark:bg-opacity-40' : ''
+                    highlightCompleted && issue.status === 'Completed'
+                      ? 'bg-green-900 bg-opacity-20 dark:bg-green-800 dark:bg-opacity-40'
+                      : ''
                   }`}
                 >
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
@@ -296,13 +343,25 @@ export default function IssuesPage() {
                     {issue.description}
                   </td>
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    {issue.type}
+                    <Selector
+                      statuses={['Enhancement', 'Bug', 'Feature']}
+                      initialStatus={issue.type}
+                      onChange={(status) => handleInputChange({ target: { name: 'type', value: status } }, issue.id)}
+                    />
                   </td>
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    {issue.priority}
+                    <Selector
+                      statuses={['Low', 'Medium', 'High']}
+                      initialStatus={issue.priority}
+                      onChange={(status) => handleInputChange({ target: { name: 'priority', value: status } }, issue.id)}
+                    />
                   </td>
                   <td className='px-4 py-2 whitespace-nowrap w-1/5'>
-                    {issue.status}
+                    <Selector
+                      statuses={['Planned', 'In Progress', 'Completed']}
+                      initialStatus={issue.status}
+                      onChange={(status) => handleInputChange({ target: { name: 'status', value: status } }, issue.id)}
+                    />
                   </td>
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 flex space-x-2 ${
@@ -332,7 +391,10 @@ export default function IssuesPage() {
                 </tr>
               ))}
               {isAddingIssue && (
-                <tr ref={editingRef} className={`${editableCellClass} dark:bg-gray-800`}>
+                <tr
+                  ref={editingRef}
+                  className={`${editableCellClass} dark:bg-gray-800`}
+                >
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
                   >
@@ -365,53 +427,29 @@ export default function IssuesPage() {
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
                   >
-                    <select
-                      name='type'
-                      value={newIssue.type}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      onKeyDown={handleKeyDown}
-                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
-                    >
-                      <option value=''>Select Type</option>
-                      <option value='Enhancement'>Enhancement</option>
-                      <option value='Bug'>Bug</option>
-                      <option value='Feature'>Feature</option>
-                    </select>
+                    <Selector
+                      statuses={['Enhancement', 'Bug', 'Feature']}
+                      initialStatus={newIssue.type}
+                      onChange={(status) => handleInputChange({ target: { name: 'type', value: status } })}
+                    />
                   </td>
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
                   >
-                    <select
-                      name='priority'
-                      value={newIssue.priority}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      onKeyDown={handleKeyDown}
-                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
-                    >
-                      <option value=''>Select Priority</option>
-                      <option value='Low'>Low</option>
-                      <option value='Medium'>Medium</option>
-                      <option value='High'>High</option>
-                    </select>
+                    <Selector
+                      statuses={['Low', 'Medium', 'High']}
+                      initialStatus={newIssue.priority}
+                      onChange={(status) => handleInputChange({ target: { name: 'priority', value: status } })}
+                    />
                   </td>
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
                   >
-                    <select
-                      name='status'
-                      value={newIssue.status}
-                      onChange={handleInputChange}
-                      onBlur={handleBlur}
-                      onKeyDown={handleKeyDown}
-                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
-                    >
-                      <option value=''>Select Status</option>
-                      <option value='Planned'>Planned</option>
-                      <option value='In Progress'>In Progress</option>
-                      <option value='Completed'>Completed</option>
-                    </select>
+                    <Selector
+                      statuses={['Planned', 'In Progress', 'Completed']}
+                      initialStatus={newIssue.status}
+                      onChange={(status) => handleInputChange({ target: { name: 'status', value: status } })}
+                    />
                   </td>
                   <td
                     className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}

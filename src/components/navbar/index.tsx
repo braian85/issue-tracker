@@ -5,9 +5,13 @@ import { Sun, Moon } from 'lucide-react'
 
 const Navbar: React.FC = () => {
   const { data: session } = useSession()
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedMode = localStorage.getItem('isDarkMode')
+    return savedMode ? JSON.parse(savedMode) : false
+  })
 
   useEffect(() => {
+    localStorage.setItem('isDarkMode', JSON.stringify(isDarkMode))
     if (isDarkMode) {
       document.documentElement.classList.add('dark')
     } else {
