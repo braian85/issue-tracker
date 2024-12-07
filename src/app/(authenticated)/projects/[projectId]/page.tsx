@@ -11,6 +11,7 @@ import {
 import { FaCheck, FaTimes } from 'react-icons/fa'
 import { Switch } from '@/components/ui/switch'
 import { Selector } from '@/components/selector/selector'
+import Loader from '@/components/loader/loader'
 
 interface Issue {
   id: number
@@ -73,6 +74,7 @@ export default function IssuesPage() {
     id: number
     field: string
   } | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -81,6 +83,8 @@ export default function IssuesPage() {
         setIssues(fetchedIssues)
       } catch (error) {
         console.error('Failed to fetch issues:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -400,6 +404,10 @@ export default function IssuesPage() {
   const sortedIssues = sortCompletedToTop
     ? [...issues].sort((a, b) => (a.status === 'Completed' ? -1 : 1))
     : issues
+
+  if (isLoading) {
+    return <Loader />
+  }
 
   return (
     <div className='flex flex-col h-full bg-background'>

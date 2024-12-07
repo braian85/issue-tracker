@@ -12,6 +12,7 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table'
+import Loader from '@/components/loader/loader'
 
 interface Project {
   id: number
@@ -25,6 +26,7 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [newProject, setNewProject] = useState({ name: '', description: '' })
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
@@ -34,11 +36,17 @@ export default function ProjectsPage() {
         setProjects(fetchedProjects as Project[])
       } catch (error) {
         console.error('Failed to fetch projects:', error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
     fetchProjects()
   }, [])
+
+  if (isLoading) {
+    return <Loader />
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
