@@ -55,7 +55,19 @@ export const Selector = ({ statuses, initialStatus, onChange }: SelectorProps) =
           />
         ))}
       </div>
-      <span className="text-sm text-foreground">{selectedStatus}</span>
+      <span className={`text-sm font-bold ${
+        selectedStatus === 'Planned' ? 'text-yellow-600 dark:text-yellow-400' :
+        selectedStatus === 'In Progress' ? 'text-blue-600 dark:text-blue-400' :
+        selectedStatus === 'Completed' ? 'text-green-600 dark:text-green-400' :
+        selectedStatus === 'Blocked' ? 'text-red-600 dark:text-red-400' :
+        selectedStatus === 'Review' ? 'text-purple-600 dark:text-purple-400' :
+        selectedStatus === 'High' ? 'text-red-600 dark:text-red-400' :
+        selectedStatus === 'Medium' ? 'text-orange-600 dark:text-orange-400' :
+        selectedStatus === 'Low' ? 'text-green-600 dark:text-green-400' :
+        'text-foreground'
+      }`}>
+        {selectedStatus}
+      </span>
     </div>
   )
 }

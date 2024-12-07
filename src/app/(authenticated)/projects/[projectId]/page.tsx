@@ -57,6 +57,8 @@ export default function IssuesPage() {
     const savedHighlight = localStorage.getItem('highlightCompleted')
     return savedHighlight ? JSON.parse(savedHighlight) : false
   })
+  const [highlightInProgress, setHighlightInProgress] = useState(false)
+  const [highlightPlanned, setHighlightPlanned] = useState(false)
   const [sortCompletedToTop, setSortCompletedToTop] = useState(false)
 
   useEffect(() => {
@@ -271,27 +273,59 @@ export default function IssuesPage() {
       <main className='flex-1 p-8 bg-background text-foreground overflow-auto'>
         <h1 className='text-2xl font-bold mb-6'>Issues</h1>
         <div className='mb-4'>
+          <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
           <label className='flex items-center'>
             <Switch
               checked={highlightCompleted}
               onCheckedChange={() => handleToggleHighlight()}
-              className={`mr-2 transition-colors duration-200 ease-in-out rounded-full ${
+              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
                 highlightCompleted ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
               }`}
+              style={{ transform: 'scale(0.8)' }}
             />
-            <span className='text-foreground dark:text-white'>
+            <span className='text-sm text-foreground dark:text-white'>
               Highlight Completed Issues
             </span>
           </label>
           <label className='flex items-center mt-2'>
             <Switch
+              checked={highlightInProgress}
+              onCheckedChange={() => setHighlightInProgress(prev => !prev)}
+              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                highlightInProgress ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
+              }`}
+              style={{ transform: 'scale(0.8)' }}
+            />
+            <span className='text-sm text-foreground dark:text-white'>
+              Highlight In Progress Issues
+            </span>
+          </label>
+          <label className='flex items-center mt-2'>
+            <Switch
+              checked={highlightPlanned}
+              onCheckedChange={() => setHighlightPlanned(prev => !prev)}
+              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                highlightPlanned ? 'bg-yellow-500 dark:bg-yellow-700' : 'bg-gray-200 dark:bg-gray-500'
+              }`}
+              style={{ transform: 'scale(0.8)' }}
+            />
+            <span className='text-sm text-foreground dark:text-white'>
+              Highlight Planned Issues
+            </span>
+          </label>
+        </div>
+        <div className='mb-4'>
+          <h2 className='text-lg font-semibold mb-2'>Sort Options</h2>
+          <label className='flex items-center'>
+            <Switch
               checked={sortCompletedToTop}
               onCheckedChange={() => setSortCompletedToTop(prev => !prev)}
-              className={`mr-2 transition-colors duration-200 ease-in-out rounded-full ${
+              className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
                 sortCompletedToTop ? 'bg-blue-500 dark:bg-blue-700' : 'bg-gray-200 dark:bg-gray-500'
               }`}
+              style={{ transform: 'scale(0.8)' }}
             />
-            <span className='text-foreground dark:text-white'>
+            <span className='text-sm text-foreground dark:text-white'>
               Sort Completed to Top
             </span>
           </label>
@@ -333,6 +367,14 @@ export default function IssuesPage() {
                   } ${
                     highlightCompleted && issue.status === 'Completed'
                       ? 'bg-green-900 bg-opacity-20 dark:bg-green-800 dark:bg-opacity-40'
+                      : ''
+                  } ${
+                    highlightInProgress && issue.status === 'In Progress'
+                      ? 'bg-blue-900 bg-opacity-20 dark:bg-blue-800 dark:bg-opacity-40'
+                      : ''
+                  } ${
+                    highlightPlanned && issue.status === 'Planned'
+                      ? 'bg-yellow-900 bg-opacity-20 dark:bg-yellow-800 dark:bg-opacity-40'
                       : ''
                   }`}
                 >
