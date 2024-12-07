@@ -41,9 +41,9 @@ export default function IssuesPage() {
   const [newIssue, setNewIssue] = useState({
     uiSection: '',
     description: '',
-    type: '',
-    priority: '',
-    status: '',
+    type: 'Enhancement',
+    priority: 'Low',
+    status: 'Planned',
   })
   const [isFormValid, setIsFormValid] = useState(false)
   const [selectedIssues, setSelectedIssues] = useState<number[]>([])
@@ -84,7 +84,7 @@ export default function IssuesPage() {
   }, [projectId])
 
   useEffect(() => {
-    setIsFormValid(Object.values(newIssue).every(value => value !== ''))
+    setIsFormValid(newIssue.uiSection.trim() !== '' && newIssue.description.trim() !== '')
   }, [newIssue])
 
   useEffect(() => {
@@ -149,9 +149,9 @@ export default function IssuesPage() {
     setNewIssue({
       uiSection: '',
       description: '',
-      type: '',
-      priority: '',
-      status: '',
+      type: 'Enhancement',
+      priority: 'Low',
+      status: 'Planned',
     })
     setIsAddingIssue(false)
   }
@@ -211,9 +211,9 @@ export default function IssuesPage() {
     setNewIssue({
       uiSection: '',
       description: '',
-      type: '',
-      priority: '',
-      status: '',
+      type: 'Enhancement',
+      priority: 'Low',
+      status: 'Planned',
     })
   }
 
