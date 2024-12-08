@@ -480,22 +480,22 @@ export default function IssuesPage() {
           <table className='min-w-full divide-y divide-border text-sm'>
             <thead className='bg-muted'>
               <tr>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[20%]'>
                   UI Section
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[30%]'>
                   Description
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[15%]'>
                   Type
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[15%]'>
                   Priority
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[15%]'>
                   Status
                 </th>
-                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                <th className='px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-[5%]'>
                   Actions
                 </th>
               </tr>
@@ -563,34 +563,39 @@ export default function IssuesPage() {
                       </div>
                     </td>
                     <td
-                      className={`px-4 py-2 whitespace-nowrap w-1/5 relative ${
+                      className={`px-4 py-2 whitespace-nowrap relative w-[30%] ${
                         editingCell?.id === issue.id &&
                         editingCell.field === 'description'
                           ? 'bg-blue-200 dark:bg-blue-800'
                           : ''
                       }`}
                       onClick={() => handleCellClick(issue.id, 'description')}
+                      style={{ maxWidth: '300px' }}
                     >
-                      {editingCell?.id === issue.id &&
-                      editingCell.field === 'description' ? (
-                        <input
-                          type='text'
-                          name='description'
-                          value={issue.description}
-                          onChange={e => handleCellChange(e, issue.id)}
-                          onBlur={() => handleCellBlur(issue.id)}
-                          onFocus={e => e.target.select()}
-                          onKeyDown={e =>
-                            handleCellKeyDown(e, issue.id, 'description')
-                          }
-                          className='absolute inset-0 text-foreground px-4 py-2 w-full h-full text-sm focus:outline-none bg-transparent'
-                          autoFocus
-                        />
-                      ) : (
-                        issue.description
-                      )}
+                      <div className="w-full h-full absolute inset-0">
+                        {editingCell?.id === issue.id &&
+                        editingCell.field === 'description' ? (
+                          <input
+                            type='text'
+                            name='description'
+                            value={issue.description}
+                            onChange={e => handleCellChange(e, issue.id)}
+                            onBlur={() => handleCellBlur(issue.id)}
+                            onFocus={e => e.target.select()}
+                            onKeyDown={e =>
+                              handleCellKeyDown(e, issue.id, 'description')
+                            }
+                            className='absolute inset-0 text-foreground px-4 py-2 w-full h-full text-sm focus:outline-none bg-transparent'
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="absolute inset-0 px-4 py-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                            {issue.description}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    <td className='px-4 py-2 whitespace-nowrap w-[15%]' style={{ maxWidth: '150px' }}>
                       <Selector
                         statuses={['Enhancement', 'Bug', 'Feature']}
                         initialStatus={issue.type}
@@ -599,7 +604,7 @@ export default function IssuesPage() {
                         }
                       />
                     </td>
-                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    <td className='px-4 py-2 whitespace-nowrap w-[15%]' style={{ maxWidth: '150px' }}>
                       <Selector
                         statuses={['Low', 'Medium', 'High']}
                         initialStatus={issue.priority}
@@ -608,7 +613,7 @@ export default function IssuesPage() {
                         }
                       />
                     </td>
-                    <td className='px-4 py-2 whitespace-nowrap w-1/5'>
+                    <td className='px-4 py-2 whitespace-nowrap w-[15%]' style={{ maxWidth: '150px' }}>
                       <Selector
                         statuses={['Planned', 'In Progress', 'Completed']}
                         initialStatus={issue.status}
@@ -666,7 +671,8 @@ export default function IssuesPage() {
                     />
                   </td>
                   <td
-                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
+                    className={`px-4 py-2 whitespace-nowrap w-[30%] ${editableCellClass} dark:bg-gray-800`}
+                    style={{ maxWidth: '300px' }}
                   >
                     <input
                       type='text'
@@ -675,39 +681,29 @@ export default function IssuesPage() {
                       onChange={handleInputChange}
                       onBlur={handleBlur}
                       onKeyDown={handleKeyDown}
-                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white'
+                      className='text-foreground px-2 py-1 w-full rounded-md text-sm focus:outline-none bg-white dark:bg-gray-900 dark:text-white overflow-hidden text-ellipsis'
                       placeholder='Description'
                     />
                   </td>
-                  <td
-                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
-                  >
+                  <td className={`px-4 py-2 whitespace-nowrap w-[15%] ${editableCellClass} dark:bg-gray-800`} style={{ maxWidth: '150px' }}>
                     <Selector
                       statuses={['Enhancement', 'Bug', 'Feature']}
                       initialStatus={newIssue.type}
                       onChange={status => handleSelectorChange('type', status)}
                     />
                   </td>
-                  <td
-                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
-                  >
+                  <td className={`px-4 py-2 whitespace-nowrap w-[15%] ${editableCellClass} dark:bg-gray-800`} style={{ maxWidth: '150px' }}>
                     <Selector
                       statuses={['Low', 'Medium', 'High']}
                       initialStatus={newIssue.priority}
-                      onChange={status =>
-                        handleSelectorChange('priority', status)
-                      }
+                      onChange={status => handleSelectorChange('priority', status)}
                     />
                   </td>
-                  <td
-                    className={`px-4 py-2 whitespace-nowrap w-1/5 ${editableCellClass} dark:bg-gray-800`}
-                  >
+                  <td className={`px-4 py-2 whitespace-nowrap w-[15%] ${editableCellClass} dark:bg-gray-800`} style={{ maxWidth: '150px' }}>
                     <Selector
                       statuses={['Planned', 'In Progress', 'Completed']}
                       initialStatus={newIssue.status}
-                      onChange={status =>
-                        handleSelectorChange('status', status)
-                      }
+                      onChange={status => handleSelectorChange('status', status)}
                     />
                   </td>
                   <td
