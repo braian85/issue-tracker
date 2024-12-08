@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import {
   getProjectIssues,
   createIssue,
@@ -38,6 +38,7 @@ const ToggleIcon: React.FC<{ isActive: boolean; onToggle: () => void }> = ({
 
 export default function IssuesPage() {
   const { projectId } = useParams()
+  const searchParams = useSearchParams()
   const [issues, setIssues] = useState<Issue[]>([])
   const [newIssue, setNewIssue] = useState({
     uiSection: '',
@@ -75,6 +76,9 @@ export default function IssuesPage() {
     field: string
   } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [projectName, setProjectName] = useState(() => {
+    return searchParams.get('name') || ''
+  })
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -412,7 +416,7 @@ export default function IssuesPage() {
   return (
     <div className='flex flex-col h-full bg-background'>
       <main className='flex-1 p-4 bg-background text-foreground overflow-auto'>
-        <h1 className='text-2xl font-bold mb-6'>Issues</h1>
+        <h1 className='text-4xl font-bold text-blue-500'>{projectName}</h1>
         <div className='mb-4 flex flex-row space-x-4'>
           <div>
             <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
@@ -428,7 +432,7 @@ export default function IssuesPage() {
                 style={{ transform: 'scale(0.8)' }}
               />
               <span className='text-sm text-foreground dark:text-white'>
-                Highlight Completed Issues
+                Completed Issues
               </span>
             </label>
             <label className='flex items-center mt-2'>
@@ -443,7 +447,7 @@ export default function IssuesPage() {
                 style={{ transform: 'scale(0.8)' }}
               />
               <span className='text-sm text-foreground dark:text-white'>
-                Highlight In Progress Issues
+                In Progress Issues
               </span>
             </label>
             <label className='flex items-center mt-2'>
@@ -458,7 +462,7 @@ export default function IssuesPage() {
                 style={{ transform: 'scale(0.8)' }}
               />
               <span className='text-sm text-foreground dark:text-white'>
-                Highlight Planned Issues
+                Planned Issues
               </span>
             </label>
           </div>

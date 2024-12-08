@@ -34,7 +34,7 @@ export default function AuthLayout({
       <Sidebar />
       <div className='flex flex-col flex-1 h-full'>
         <Navbar />
-        <main className='flex-1 p-4 bg-background text-foreground overflow-y-hidden'>
+        <main className='flex-1 bg-background text-foreground overflow-y-hidden'>
           {children}
         </main>
       </div>

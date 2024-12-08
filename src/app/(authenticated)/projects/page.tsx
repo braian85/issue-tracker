@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { getAllProjects, createProject } from '@/clientAPI/projects/index'
 import {
   Table,
-  TableCaption,
   TableHeader,
   TableRow,
   TableHead,
@@ -65,12 +64,14 @@ export default function ProjectsPage() {
     }
   }
 
-  const handleProjectClick = (projectId: number) => {
-    router.push(`/projects/${projectId}`)
+  const handleProjectClick = (projectId: number, projectName: string) => {
+    router.push(
+      `/projects/${projectId}?name=${encodeURIComponent(projectName)}`
+    )
   }
 
   return (
-    <div className='container mx-auto px-4 py-4'>
+    <div className='container px-4 py-4 w-full'>
       <div className='flex justify-between items-center'>
         <h1 className='text-4xl font-bold text-blue-500'>Projects</h1>
         <button
@@ -142,14 +143,20 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      <div className='rounded-xl shadow-xl p-8'>
+      <div className='rounded-xl shadow-xl py-8'>
         <div className='overflow-hidden rounded-lg border border-gray-700'>
           <Table>
             <TableHeader>
               <TableRow className='hover:bg-transparent border-gray-700'>
-                <TableHead className='text-gray-800 dark:text-gray-300'>Name</TableHead>
-                <TableHead className='text-gray-800 dark:text-gray-300'>Created</TableHead>
-                <TableHead className='text-gray-800 dark:text-gray-300'>Updated</TableHead>
+                <TableHead className='text-gray-800 dark:text-gray-300'>
+                  Name
+                </TableHead>
+                <TableHead className='text-gray-800 dark:text-gray-300'>
+                  Created
+                </TableHead>
+                <TableHead className='text-gray-800 dark:text-gray-300'>
+                  Updated
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -157,7 +164,7 @@ export default function ProjectsPage() {
                 <TableRow
                   key={project.id}
                   className='cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700/50 transition-colors border-gray-700'
-                  onClick={() => handleProjectClick(project.id)}
+                  onClick={() => handleProjectClick(project.id, project.name)}
                 >
                   <TableCell className='font-medium text-gray-900 dark:text-gray-200'>
                     {project.name}
