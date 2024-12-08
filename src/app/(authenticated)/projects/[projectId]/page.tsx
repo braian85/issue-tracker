@@ -524,35 +524,46 @@ export default function IssuesPage() {
                     className={`hover:bg-gray-100 dark:hover:bg-gray-700 h-10 ${rowHighlightClass}`}
                   >
                     <td
-                      className={`px-4 py-2 whitespace-nowrap w-1/5 ${
+                      className={`px-4 py-2 whitespace-nowrap relative w-[20%] ${
                         editingCell?.id === issue.id &&
                         editingCell.field === 'uiSection'
                           ? 'bg-blue-200 dark:bg-blue-800'
                           : ''
                       }`}
                       onClick={() => handleCellClick(issue.id, 'uiSection')}
+                      style={{ width: '20%' }}
                     >
-                      {editingCell?.id === issue.id &&
-                      editingCell.field === 'uiSection' ? (
-                        <input
-                          type='text'
-                          name='uiSection'
-                          value={issue.uiSection}
-                          onChange={e => handleCellChange(e, issue.id)}
-                          onBlur={() => handleCellBlur(issue.id)}
-                          onFocus={e => e.target.select()}
-                          onKeyDown={e =>
-                            handleCellKeyDown(e, issue.id, 'uiSection')
-                          }
-                          className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
-                          autoFocus
-                        />
-                      ) : (
-                        issue.uiSection
-                      )}
+                      <div className="w-full h-full absolute inset-0">
+                        {editingCell?.id === issue.id &&
+                        editingCell.field === 'uiSection' ? (
+                          <input
+                            type='text'
+                            name='uiSection'
+                            value={issue.uiSection}
+                            onChange={e => handleCellChange(e, issue.id)}
+                            onBlur={() => handleCellBlur(issue.id)}
+                            onFocus={e => e.target.select()}
+                            onKeyDown={e =>
+                              handleCellKeyDown(e, issue.id, 'uiSection')
+                            }
+                            className='absolute inset-0 text-foreground px-4 py-2 text-sm focus:outline-none bg-transparent border-0'
+                            style={{
+                              width: '100%',
+                              boxSizing: 'border-box',
+                              margin: 0,
+                              padding: '8px 16px'
+                            }}
+                            autoFocus
+                          />
+                        ) : (
+                          <span className="absolute inset-0 px-4 py-2 overflow-hidden text-ellipsis">
+                            {issue.uiSection}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td
-                      className={`px-4 py-2 whitespace-nowrap w-1/5 ${
+                      className={`px-4 py-2 whitespace-nowrap w-1/5 relative ${
                         editingCell?.id === issue.id &&
                         editingCell.field === 'description'
                           ? 'bg-blue-200 dark:bg-blue-800'
@@ -572,7 +583,7 @@ export default function IssuesPage() {
                           onKeyDown={e =>
                             handleCellKeyDown(e, issue.id, 'description')
                           }
-                          className='text-foreground px-2 py-1 w-full h-full text-sm focus:outline-none bg-transparent'
+                          className='absolute inset-0 text-foreground px-4 py-2 w-full h-full text-sm focus:outline-none bg-transparent'
                           autoFocus
                         />
                       ) : (
