@@ -379,24 +379,15 @@ export default function IssuesPage() {
     issueId: number,
     field: string
   ) => {
-    const formElements = Array.from(
-      editingRef.current?.querySelectorAll('input, select') || []
-    )
-    const index = formElements.indexOf(e.target as Element)
-
     if (e.key === 'Tab') {
       e.preventDefault()
       if (e.shiftKey) {
-        if (index > 0) {
-          ;(formElements[index - 1] as HTMLElement).focus()
-        } else if (index === 0) {
-          ;(formElements[formElements.length - 1] as HTMLElement).focus()
+        if (field === 'description') {
+          handleCellClick(issueId, 'uiSection')
         }
       } else {
-        if (index > -1 && index < formElements.length - 1) {
-          ;(formElements[index + 1] as HTMLElement).focus()
-        } else if (index === formElements.length - 1) {
-          ;(formElements[0] as HTMLElement).focus()
+        if (field === 'uiSection') {
+          handleCellClick(issueId, 'description')
         }
       }
     } else if (e.key === 'Enter') {
