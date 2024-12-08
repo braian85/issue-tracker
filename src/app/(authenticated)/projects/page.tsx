@@ -71,7 +71,7 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className='container px-4 py-4 w-full'>
+    <div className='px-4 py-4 w-full'>
       <div className='flex justify-between items-center'>
         <h1 className='text-4xl font-bold text-blue-500'>Projects</h1>
         <button

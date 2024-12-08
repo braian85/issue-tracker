@@ -8,7 +8,7 @@ import {
   updateIssue,
   deleteIssue,
 } from '@/clientAPI/projects/index'
-import { FaCheck, FaTimes } from 'react-icons/fa'
+import { FaCheck, FaTimes, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import { Switch } from '@/components/ui/switch'
 import { Selector } from '@/components/selector/selector'
 import Loader from '@/components/loader/loader'
@@ -79,6 +79,7 @@ export default function IssuesPage() {
   const [projectName, setProjectName] = useState(() => {
     return searchParams.get('name') || ''
   })
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   useEffect(() => {
     const fetchIssues = async () => {
@@ -408,73 +409,87 @@ export default function IssuesPage() {
     <div className='flex flex-col h-full bg-background'>
       <main className='flex-1 p-4 bg-background text-foreground overflow-auto'>
         <h1 className='text-4xl font-bold text-blue-500'>{projectName}</h1>
-        <div className='mb-4 flex flex-row space-x-4'>
-          <div>
-            <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
-            <label className='flex items-center'>
-              <Switch
-                checked={highlightCompleted}
-                onCheckedChange={handleToggleHighlightCompleted}
-                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightCompleted
-                    ? 'bg-blue-500 dark:bg-blue-700'
-                    : 'bg-gray-200 dark:bg-gray-500'
-                }`}
-                style={{ transform: 'scale(0.8)' }}
-              />
-              <span className='text-sm text-foreground dark:text-white'>
-                Completed Issues
-              </span>
-            </label>
-            <label className='flex items-center mt-2'>
-              <Switch
-                checked={highlightInProgress}
-                onCheckedChange={handleToggleHighlightInProgress}
-                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightInProgress
-                    ? 'bg-blue-500 dark:bg-blue-700'
-                    : 'bg-gray-200 dark:bg-gray-500'
-                }`}
-                style={{ transform: 'scale(0.8)' }}
-              />
-              <span className='text-sm text-foreground dark:text-white'>
-                In Progress Issues
-              </span>
-            </label>
-            <label className='flex items-center mt-2'>
-              <Switch
-                checked={highlightPlanned}
-                onCheckedChange={handleToggleHighlightPlanned}
-                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  highlightPlanned
-                    ? 'bg-blue-500 dark:bg-blue-700'
-                    : 'bg-gray-200 dark:bg-gray-500'
-                }`}
-                style={{ transform: 'scale(0.8)' }}
-              />
-              <span className='text-sm text-foreground dark:text-white'>
-                Planned Issues
-              </span>
-            </label>
-          </div>
-          <div>
-            <h2 className='text-lg font-semibold mb-2'>Sort Options</h2>
-            <label className='flex items-center'>
-              <Switch
-                checked={sortCompletedToTop}
-                onCheckedChange={handleToggleSortCompletedToTop}
-                className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
-                  sortCompletedToTop
-                    ? 'bg-blue-500 dark:bg-blue-700'
-                    : 'bg-gray-200 dark:bg-gray-500'
-                }`}
-                style={{ transform: 'scale(0.8)' }}
-              />
-              <span className='text-sm text-foreground dark:text-white'>
-                Sort Completed to Top
-              </span>
-            </label>
-          </div>
+        <div className='py-4'>
+          <button
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className='flex items-center space-x-2 text-lg font-semibold text-foreground hover:text-blue-500 transition-colors'
+          >
+            <span>Project Settings</span>
+            {isSettingsOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </button>
+          
+          {isSettingsOpen && (
+            <div className='mt-4 py-4 px-6 bg-card rounded-lg shadow-sm'>
+              <div className='flex flex-row space-x-12'>
+                <div>
+                  <h2 className='text-lg font-semibold mb-2'>Highlight Options</h2>
+                  <label className='flex items-center'>
+                    <Switch
+                      checked={highlightCompleted}
+                      onCheckedChange={handleToggleHighlightCompleted}
+                      className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                        highlightCompleted
+                          ? 'bg-blue-500 dark:bg-blue-700'
+                          : 'bg-gray-200 dark:bg-gray-500'
+                      }`}
+                      style={{ transform: 'scale(0.8)' }}
+                    />
+                    <span className='text-sm text-foreground dark:text-white'>
+                      Completed Issues
+                    </span>
+                  </label>
+                  <label className='flex items-center mt-2'>
+                    <Switch
+                      checked={highlightInProgress}
+                      onCheckedChange={handleToggleHighlightInProgress}
+                      className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                        highlightInProgress
+                          ? 'bg-blue-500 dark:bg-blue-700'
+                          : 'bg-gray-200 dark:bg-gray-500'
+                      }`}
+                      style={{ transform: 'scale(0.8)' }}
+                    />
+                    <span className='text-sm text-foreground dark:text-white'>
+                      In Progress Issues
+                    </span>
+                  </label>
+                  <label className='flex items-center mt-2'>
+                    <Switch
+                      checked={highlightPlanned}
+                      onCheckedChange={handleToggleHighlightPlanned}
+                      className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                        highlightPlanned
+                          ? 'bg-blue-500 dark:bg-blue-700'
+                          : 'bg-gray-200 dark:bg-gray-500'
+                      }`}
+                      style={{ transform: 'scale(0.8)' }}
+                    />
+                    <span className='text-sm text-foreground dark:text-white'>
+                      Planned Issues
+                    </span>
+                  </label>
+                </div>
+                <div>
+                  <h2 className='text-lg font-semibold mb-2'>Sort Options</h2>
+                  <label className='flex items-center'>
+                    <Switch
+                      checked={sortCompletedToTop}
+                      onCheckedChange={handleToggleSortCompletedToTop}
+                      className={`mr-1 transition-colors duration-200 ease-in-out rounded-full ${
+                        sortCompletedToTop
+                          ? 'bg-blue-500 dark:bg-blue-700'
+                          : 'bg-gray-200 dark:bg-gray-500'
+                      }`}
+                      style={{ transform: 'scale(0.8)' }}
+                    />
+                    <span className='text-sm text-foreground dark:text-white'>
+                      Sort Completed to Top
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
         <div className='bg-card shadow-md rounded-lg overflow-hidden'>
           <table className='min-w-full divide-y divide-border text-sm'>
